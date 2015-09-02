@@ -45,6 +45,11 @@ namespace ts {
         let compilerOptions = host.getCompilerOptions();
         let languageVersion = compilerOptions.target || ScriptTarget.ES3;
 
+        // TODO: new... duplication with emitter.ts
+        let featureVersion = {
+            generators: compilerOptions['target-generators'] || languageVersion
+        };
+
         let emitResolver = createResolver();
 
         let undefinedSymbol = createSymbol(SymbolFlags.Property | SymbolFlags.Transient, "undefined");
@@ -10373,7 +10378,7 @@ namespace ts {
                 }
 
                 if (node.type) {
-                    if (languageVersion >= ScriptTarget.ES6 && isSyntacticallyValidGenerator(node)) {
+                    if (featureVersion.generators >= ScriptTarget.ES6 && isSyntacticallyValidGenerator(node)) {
                         let returnType = getTypeFromTypeNode(node.type);
                         if (returnType === voidType) {
                             error(node.type, Diagnostics.A_generator_cannot_have_a_void_type_annotation);
@@ -15116,7 +15121,7 @@ namespace ts {
                 if (!node.body) {
                     return grammarErrorOnNode(node.asteriskToken, Diagnostics.An_overload_signature_cannot_be_declared_as_a_generator);
                 }
-                if (languageVersion < ScriptTarget.ES6) {
+                if (featureVersion.generators < ScriptTarget.ES6) {
                     return grammarErrorOnNode(node.asteriskToken, Diagnostics.Generators_are_only_available_when_targeting_ECMAScript_6_or_higher);
                 }
             }
