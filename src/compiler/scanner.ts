@@ -1279,6 +1279,52 @@ namespace ts {
                                 error(Diagnostics.Asterisk_Slash_expected);
                             }
 
+                            // TODO: temp testing... handle preprocessor directives #if and #endif
+                            // TODO: tolerate whitespace after '/*', after '#directive', and before '*/'
+                            // TODO: currently no nesting and no operators (&&, ||), but need one or other to express conjoint conditions
+                            if (commentClosed && text.charCodeAt(startPos + 2) === CharacterCodes.hash) {
+                                if (text.charCodeAt(startPos + 3) === CharacterCodes.i
+                                    && text.charCodeAt(startPos + 4) === CharacterCodes.f
+                                    && text.charCodeAt(startPos + 5) === CharacterCodes.space) {
+                                    // found /*#if <symbol>*/
+                                    let symbol = text.slice(startPos + 6, pos - 2);
+console.log('#IF ' + symbol);
+
+                                    // Skip tokens until #ENDIF is found
+                                    // TODO: do this conditionally on whether symbol is defined or not...
+                                    if (symbol !== 'TRUE') {
+                                        let oldSkipTrivia = skipTrivia;
+                                        skipTrivia = false;
+                                        let token: SyntaxKind;
+                                        while (true) {
+                                            token = scan();
+                                            if (token === SyntaxKind.PreprocessorDirectiveEndifTrivia) break;
+                                            if (token === SyntaxKind.EndOfFileToken) break;
+                                        }
+                                        skipTrivia = oldSkipTrivia;
+                                        // TODO: if token is end-of-file, error 'expected #endif'
+                                    }
+                                }
+
+                                else if (pos - startPos === 10
+                                    && text.charCodeAt(startPos + 2) === CharacterCodes.hash
+                                    && text.charCodeAt(startPos + 3) === CharacterCodes.e
+                                    && text.charCodeAt(startPos + 4) === CharacterCodes.n
+                                    && text.charCodeAt(startPos + 5) === CharacterCodes.d
+                                    && text.charCodeAt(startPos + 6) === CharacterCodes.i
+                                    && text.charCodeAt(startPos + 7) === CharacterCodes.f) {
+                                    // found /*#endif*/
+console.log('#ENDIF');
+                                    // TODO: explain why no skipTrivia check needed here...
+                                    return SyntaxKind.PreprocessorDirectiveEndifTrivia;
+                                }
+
+
+
+
+
+                            }
+
                             if (skipTrivia) {
                                 continue;
                             }

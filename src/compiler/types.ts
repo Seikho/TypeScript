@@ -24,6 +24,8 @@ namespace ts {
         EndOfFileToken,
         SingleLineCommentTrivia,
         MultiLineCommentTrivia,
+        PreprocessorDirectiveIfTrivia,
+        PreprocessorDirectiveEndifTrivia,
         NewLineTrivia,
         WhitespaceTrivia,
         // We detect and preserve #! on the first line
