@@ -46,8 +46,10 @@ namespace ts {
         let languageVersion = compilerOptions.target || ScriptTarget.ES3;
 
         // TODO: new... duplication with emitter.ts
-        let featureVersion = {
-            generators: compilerOptions['target-generators'] || languageVersion
+        let featureVersion = {                                                      // PREREQUISITES:
+            iterables: compilerOptions['target-iterables'] || languageVersion,      // (none)
+            forOf: compilerOptions['target-forOf'] || languageVersion,              // iterables
+            generators: compilerOptions['target-generators'] || languageVersion,    // iterables
         };
 
         let emitResolver = createResolver();
@@ -2455,11 +2457,11 @@ namespace ts {
                 }
             });
             if (!elementTypes.length) {
-                return languageVersion >= ScriptTarget.ES6 ? createIterableType(anyType) : anyArrayType;
+                return featureVersion.iterables >= ScriptTarget.ES6 ? createIterableType(anyType) : anyArrayType;
             }
             else if (hasSpreadElement) {
                 let unionOfElements = getUnionType(elementTypes);
-                return languageVersion >= ScriptTarget.ES6 ? createIterableType(unionOfElements) : createArrayType(unionOfElements);
+                return featureVersion.iterables >= ScriptTarget.ES6 ? createIterableType(unionOfElements) : createArrayType(unionOfElements);
             }
 
             // If the pattern has at least one element, and no rest element, then it should imply a tuple type.
@@ -6812,7 +6814,7 @@ namespace ts {
                 let index = indexOf(arrayLiteral.elements, node);
                 return getTypeOfPropertyOfContextualType(type, "" + index)
                     || getIndexTypeOfContextualType(type, IndexKind.Number)
-                    || (languageVersion >= ScriptTarget.ES6 ? getElementTypeOfIterable(type, /*errorNode*/ undefined) : undefined);
+                    || (featureVersion.iterables >= ScriptTarget.ES6 ? getElementTypeOfIterable(type, /*errorNode*/ undefined) : undefined);
             }
             return undefined;
         }
@@ -7038,7 +7040,7 @@ namespace ts {
                     // if there is no index type / iterated type.
                     let restArrayType = checkExpression((<SpreadElementExpression>e).expression, contextualMapper);
                     let restElementType = getIndexTypeOfType(restArrayType, IndexKind.Number) ||
-                        (languageVersion >= ScriptTarget.ES6 ? getElementTypeOfIterable(restArrayType, /*errorNode*/ undefined) : undefined);
+                        (featureVersion.iterables >= ScriptTarget.ES6 ? getElementTypeOfIterable(restArrayType, /*errorNode*/ undefined) : undefined);
                     if (restElementType) {
                         elementTypes.push(restElementType);
                     }
@@ -12010,7 +12012,7 @@ namespace ts {
                 return inputType;
             }
 
-            if (languageVersion >= ScriptTarget.ES6) {
+            if (featureVersion.iterables >= ScriptTarget.ES6) {
                 return checkElementTypeOfIterable(inputType, errorNode);
             }
 
@@ -12189,7 +12191,7 @@ namespace ts {
          *   2. Some constituent is a string and target is less than ES5 (because in ES3 string is not indexable).
          */
         function checkElementTypeOfArrayOrString(arrayOrStringType: Type, errorNode: Node): Type {
-            Debug.assert(languageVersion < ScriptTarget.ES6);
+            Debug.assert(featureVersion.iterables < ScriptTarget.ES6);
 
             // After we remove all types that are StringLike, we will know if there was a string constituent
             // based on whether the remaining type is the same as the initial type.
@@ -14572,9 +14574,6 @@ namespace ts {
                 globalTemplateStringsArrayType = getGlobalType("TemplateStringsArray");
                 globalESSymbolType = getGlobalType("Symbol");
                 globalESSymbolConstructorSymbol = getGlobalValueSymbol("Symbol");
-                globalIterableType = <GenericType>getGlobalType("Iterable", /*arity*/ 1);
-                globalIteratorType = <GenericType>getGlobalType("Iterator", /*arity*/ 1);
-                globalIterableIteratorType = <GenericType>getGlobalType("IterableIterator", /*arity*/ 1);
             }
             else {
                 globalTemplateStringsArrayType = unknownType;
@@ -14584,6 +14583,13 @@ namespace ts {
                 // a global Symbol already, particularly if it is a class.
                 globalESSymbolType = createAnonymousType(undefined, emptySymbols, emptyArray, emptyArray, undefined, undefined);
                 globalESSymbolConstructorSymbol = undefined;
+            }
+            if (featureVersion.iterables >= ScriptTarget.ES6) {
+                globalIterableType = <GenericType>getGlobalType("Iterable", /*arity*/ 1);
+                globalIteratorType = <GenericType>getGlobalType("Iterator", /*arity*/ 1);
+                globalIterableIteratorType = <GenericType>getGlobalType("IterableIterator", /*arity*/ 1);
+            }
+            else {
                 globalIterableType = emptyGenericType;
                 globalIteratorType = emptyGenericType;
                 globalIterableIteratorType = emptyGenericType;

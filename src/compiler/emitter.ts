@@ -66,8 +66,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
         let languageVersion = compilerOptions.target || ScriptTarget.ES3;
 
         // TODO: new... duplication with checker.ts
-        let featureVersion = {
-            generators: compilerOptions['target-generators'] || languageVersion
+        let featureVersion = {                                                      // PREREQUISITES:
+            iterables: compilerOptions['target-iterables'] || languageVersion,      // (none)
+            forOf: compilerOptions['target-forOf'] || languageVersion,              // iterables
+            generators: compilerOptions['target-generators'] || languageVersion,    // iterables
         };
 
         let sourceMapDataList: SourceMapData[] = compilerOptions.sourceMap || compilerOptions.inlineSourceMap ? [] : undefined;
@@ -2744,7 +2746,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
             }
 
             function emitForInOrForOfStatement(node: ForInStatement | ForOfStatement) {
-                if (languageVersion < ScriptTarget.ES6 && node.kind === SyntaxKind.ForOfStatement) {
+                if (featureVersion.forOf < ScriptTarget.ES6 && node.kind === SyntaxKind.ForOfStatement) {
                     return emitDownLevelForOfStatement(node);
                 }
 
