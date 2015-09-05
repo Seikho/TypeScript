@@ -493,6 +493,13 @@ namespace ts {
           }
       }
 
+    let preprocessorSymbols: string[] = [];
+
+    /* @internal */
+    export function setPreprocessorSymbols(value: string[]) {
+        preprocessorSymbols = value;
+    }
+
     function isPreprocessorTrivia(text: string, pos: number): boolean {
         if (pos > 0 && !isLineBreak(text.charCodeAt(pos - 1))) return false;
         if (isPreprocessorIfDirectiveStart(text, pos)) return true;
@@ -545,8 +552,7 @@ namespace ts {
             }
 
             // If the preprocessor symbol is defined OR if we scanning nested directives, we are done
-            // TODO: actually look up symbol
-            if (preprocessorSymbol === 'TRUE' || nested) {
+            if (preprocessorSymbols.indexOf(preprocessorSymbol) !== -1 || nested) {
                 return pos;
             }
 
