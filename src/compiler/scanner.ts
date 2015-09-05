@@ -409,8 +409,8 @@ namespace ts {
                   // Starts of conflict marker trivia
                   return true;
               case CharacterCodes.hash:
-                  // Only if its the beginning can we have #! trivia
-                  return pos === 0;
+                  // Starts of shebang or preprocessor directive trivia
+                  return pos === 0 || isLineBreak(text.charCodeAt(pos - 1));
               default:
                   return ch > CharacterCodes.maxAsciiCharacter;
           }
@@ -476,6 +476,10 @@ namespace ts {
                           pos = scanShebangTrivia(text, pos);
                           continue;
                       }
+                      if (isPreprocessorTrivia(text, pos)) {
+                          pos = scanPreprocessorTrivia(text, pos);
+                          continue;
+                      }
                       break;
 
                   default:
@@ -488,6 +492,114 @@ namespace ts {
               return pos;
           }
       }
+
+    let preprocessorSymbols: string[] = [];
+
+    /* @internal */
+    export function setPreprocessorSymbols(value: string[]) {
+        preprocessorSymbols = value;
+    }
+
+    function isPreprocessorTrivia(text: string, pos: number): boolean {
+        if (pos > 0 && !isLineBreak(text.charCodeAt(pos - 1))) return false;
+        if (isPreprocessorIfDirectiveStart(text, pos)) return true;
+        if (isPreprocessorEndifDirectiveStart(text, pos)) return true;
+        return false;
+    }
+
+    function isPreprocessorIfDirectiveStart(text: string, pos: number): boolean {
+        return text.length - pos >= 4
+            && text.charCodeAt(pos + 0) === CharacterCodes.hash
+            && text.charCodeAt(pos + 1) === CharacterCodes.i
+            && text.charCodeAt(pos + 2) === CharacterCodes.f
+            && text.charCodeAt(pos + 3) === CharacterCodes.space;
+    }
+
+    function isPreprocessorEndifDirectiveStart(text: string, pos: number): boolean {
+        return text.length - pos >= 6
+            && text.charCodeAt(pos + 0) === CharacterCodes.hash
+            && text.charCodeAt(pos + 1) === CharacterCodes.e
+            && text.charCodeAt(pos + 2) === CharacterCodes.n
+            && text.charCodeAt(pos + 3) === CharacterCodes.d
+            && text.charCodeAt(pos + 4) === CharacterCodes.i
+            && text.charCodeAt(pos + 5) === CharacterCodes.f;
+    }
+
+    function isPreprocessorSymbolPart(ch: number): boolean {
+        return ch >= CharacterCodes.A && ch <= CharacterCodes.Z || ch >= CharacterCodes.a && ch <= CharacterCodes.z ||
+            ch >= CharacterCodes._0 && ch <= CharacterCodes._9 || ch === CharacterCodes.$ || ch === CharacterCodes._;
+    }
+
+    function scanPreprocessorTrivia(text: string, pos: number, nested = false, error?: ErrorCallback): number {
+        let startPos = pos;
+        if (isPreprocessorIfDirectiveStart(text, pos)) {
+            pos += 4;
+
+            // scan the preprocessor symbol
+            let preprocessorSymbolStart = pos;
+            while (pos < text.length) {
+                let ch = text.charCodeAt(pos);
+                if (!isPreprocessorSymbolPart(ch)) break;
+                if (preprocessorSymbolStart === pos && isDigit(ch)) break;
+                pos++;
+            }
+            let preprocessorSymbol = text.substring(preprocessorSymbolStart, pos);
+            if (error && preprocessorSymbol.length === 0) {
+                error(Diagnostics.if_preprocessor_directive_must_specify_an_identifier, pos - startPos);
+            }
+            if (error && pos < text.length && !isLineBreak(text.charCodeAt(pos))) {
+                error(Diagnostics.Unexpected_characters_found_after_preprocessor_directive, pos - startPos);
+            }
+
+            // If the preprocessor symbol is defined OR if we scanning nested directives, we are done
+            if (preprocessorSymbols.indexOf(preprocessorSymbol) !== -1 || nested) {
+                return pos;
+            }
+
+            // The preprocessor symbol is not defined.
+            // Skip everything down to and including the matching #endif line.
+            let depth = 1;
+            let startSkipPos = pos;
+            while (true) {
+
+                // Skip to start of next line or EOF
+                // TODO: account for multiline comments and template strings? They could have #if/#endif on a line start. Ignore those?
+                //       - well this is a *preprocessing* step so it makes sense to process directives *before* comments and strings, so leave as-is?
+                while (pos < text.length && !isLineBreak(text.charCodeAt(pos))) {
+                    pos++;
+                }
+                if (pos === text.length) break;
+                pos++;
+
+                // Count nested #if and #endif directives until matching #endif is found
+                if (isPreprocessorIfDirectiveStart(text, pos)) {
+                    pos = scanPreprocessorTrivia(text, pos, /*nested*/ true);
+                    depth++;
+                }
+                if (isPreprocessorEndifDirectiveStart(text, pos)) {
+                    pos = scanPreprocessorTrivia(text, pos, /*nested*/ true);
+                    depth--;
+                }
+                if (depth === 0) break;
+            }
+
+            if (error && depth > 0) {
+                error(Diagnostics.if_preprocessor_directive_has_no_matching_endif, startSkipPos - startPos);
+            }
+            if (error && pos < text.length && !isLineBreak(text.charCodeAt(pos))) {
+                error(Diagnostics.Unexpected_characters_found_after_preprocessor_directive, pos - startPos);
+            }
+
+        }
+        else if (isPreprocessorEndifDirectiveStart(text, pos)) {
+            pos += 6;
+            if (error && pos < text.length && !isLineBreak(text.charCodeAt(pos))) {
+                error(Diagnostics.Unexpected_characters_found_after_preprocessor_directive, pos - startPos);
+            }
+        }
+
+        return pos;
+    }
 
       // All conflict markers consist of the same character repeated seven times.  If it is
       // a <<<<<<< or >>>>>>> marker then it is also followd by a space.
@@ -1137,6 +1249,17 @@ namespace ts {
                     }
                     else {
                         return token = SyntaxKind.ShebangTrivia;
+                    }
+                }
+
+                // Special handling for preprocessor directives #if and #endif
+                if (ch === CharacterCodes.hash && isPreprocessorTrivia(text, pos)) {
+                    pos = scanPreprocessorTrivia(text, pos, false, error);
+                    if (skipTrivia) {
+                        continue;
+                    }
+                    else {
+                        return token = SyntaxKind.PreprocessorTrivia;
                     }
                 }
 

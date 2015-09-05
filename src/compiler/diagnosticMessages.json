@@ -2441,5 +2441,18 @@
     "A constructor cannot contain a 'super' call when its class extends 'null'": {
       "category": "Error",
       "code": 17005
+    },
+
+    "#if preprocessor directive must specify an identifier": {
+        "category":  "Error",
+        "code": 18000
+    },
+    "Unexpected characters found after preprocessor directive": {
+        "category":  "Error",
+        "code": 18002
+    },
+    "#if preprocessor directive has no matching #endif": {
+        "category":  "Error",
+        "code": 18004
     }
 }
