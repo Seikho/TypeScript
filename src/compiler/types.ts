@@ -24,10 +24,9 @@ namespace ts {
         EndOfFileToken,
         SingleLineCommentTrivia,
         MultiLineCommentTrivia,
-        PreprocessorDirectiveIfTrivia,
-        PreprocessorDirectiveEndifTrivia,
         NewLineTrivia,
         WhitespaceTrivia,
+        PreprocessorTrivia,
         // We detect and preserve #! on the first line
         ShebangTrivia,
         // We detect and provide better error recovery when we encounter a git merge marker.  This
