@@ -2153,7 +2153,9 @@ namespace ts {
 
 namespace ts {
     export function getDefaultLibFileName(options: CompilerOptions): string {
-        return options.target === ScriptTarget.ES6 ? "lib.es6.d.ts" : "lib.d.ts";
+        // Always return the same lib file. Preprocessor directives
+        // within the lib file will take care of target differences.
+        return "lib.es6.d.ts";
     }
 
     export function textSpanEnd(span: TextSpan) {
@@ -2381,5 +2383,40 @@ namespace ts {
                 }
             }
         }
+    }
+
+    export function getLanguageVersion(compilerOptions: CompilerOptions): LanguageVersion {
+        var baseline = compilerOptions.target || ScriptTarget.ES3;
+        return {
+            baseline,
+            iterables: compilerOptions.targetIterables !== void 0 ? compilerOptions.targetIterables : baseline >= ScriptTarget.ES6,
+            forOf: compilerOptions.targetForOf !== void 0 ? compilerOptions.targetForOf : baseline >= ScriptTarget.ES6,
+            generators: compilerOptions.targetGenerators !== void 0 ? compilerOptions.targetGenerators : baseline >= ScriptTarget.ES6
+        };
+    }
+
+    export function getPreprocessorSymbolsFromCompilerOptions(compilerOptions: CompilerOptions): string[] {
+        var symbols: string[] = [];
+        for (let key in compilerOptions) {
+            if (!compilerOptions.hasOwnProperty(key)) continue;
+            if (key.indexOf('target') === 0 && key.length > 6) {
+                if (compilerOptions[key]) {
+                    symbols.push(toUpperSnakeCase(key));
+                }
+            }
+        }
+        return symbols;
+    }
+
+    export function toUpperSnakeCase(identifier: string): string {
+        var result = '';
+        for (var i = 0; i < identifier.length; ++i) {
+            var c = identifier.charAt(i);
+            if (i > 0 && c >= 'A' && c <= 'Z') {
+                result += '_';
+            }
+            result += c.toUpperCase();
+        }
+        return result;
     }
 }

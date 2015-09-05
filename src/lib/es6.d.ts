@@ -50,11 +50,13 @@ interface SymbolConstructor {
       */
     isConcatSpreadable: symbol;
 
+#if TARGET_ITERABLES
     /** 
       * A method that returns the default iterator for an object. Called by the semantics of the 
       * for-of statement.
       */
     iterator: symbol;
+#endif
 
     /**
       * A regular expression method that matches the regular expression against a string. Called 
@@ -252,8 +254,10 @@ interface NumberConstructor {
 }
 
 interface Array<T> {
+#if TARGET_ITERABLES
     /** Iterator */
     [Symbol.iterator](): IterableIterator<T>;
+#endif
 
     /**
      * Returns an object whose properties have the value 'true'
@@ -269,6 +273,7 @@ interface Array<T> {
         values: boolean;
     };
 
+#if TARGET_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -283,6 +288,7 @@ interface Array<T> {
       * Returns an list of values in the array
       */
     values(): IterableIterator<T>;
+#endif
 
     /** 
       * Returns the value of the first element in the array where predicate is true, and undefined 
@@ -329,8 +335,10 @@ interface Array<T> {
 }
 
 interface IArguments {
+#if TARGET_ITERABLES
     /** Iterator */
     [Symbol.iterator](): IterableIterator<any>;
+#endif
 }
 
 interface ArrayConstructor {
@@ -342,6 +350,7 @@ interface ArrayConstructor {
       */
     from<T, U>(arrayLike: ArrayLike<T>, mapfn: (v: T, k: number) => U, thisArg?: any): Array<U>;
 
+#if TARGET_ITERABLES
     /**
       * Creates an array from an iterable object.
       * @param iterable An iterable object to convert to an array.
@@ -349,6 +358,7 @@ interface ArrayConstructor {
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
     from<T, U>(iterable: Iterable<T>, mapfn: (v: T, k: number) => U, thisArg?: any): Array<U>;
+#endif
 
     /**
       * Creates an array from an array-like object.
@@ -356,11 +366,13 @@ interface ArrayConstructor {
       */
     from<T>(arrayLike: ArrayLike<T>): Array<T>;
 
+#if TARGET_ITERABLES
     /**
       * Creates an array from an iterable object.
       * @param iterable An iterable object to convert to an array.
       */
     from<T>(iterable: Iterable<T>): Array<T>;
+#endif
 
     /**
       * Returns a new array from a set of elements.
@@ -370,8 +382,10 @@ interface ArrayConstructor {
 }
 
 interface String {
+#if TARGET_ITERABLES
     /** Iterator */
     [Symbol.iterator](): IterableIterator<string>;
+#endif
 
     /**
       * Returns a nonnegative integer Number less than 1114112 (0x110000) that is the code point 
@@ -518,6 +532,7 @@ interface StringConstructor {
     raw(template: TemplateStringsArray, ...substitutions: any[]): string;
 }
 
+#if TARGET_ITERABLES
 interface IteratorResult<T> {
     done: boolean;
     value?: T;
@@ -536,7 +551,9 @@ interface Iterable<T> {
 interface IterableIterator<T> extends Iterator<T> {
     [Symbol.iterator](): IterableIterator<T>;
 }
+#endif
 
+#if TARGET_GENERATORS
 interface GeneratorFunction extends Function {
 
 }
@@ -551,6 +568,7 @@ interface GeneratorFunctionConstructor {
     prototype: GeneratorFunction;
 }
 declare var GeneratorFunction: GeneratorFunctionConstructor;
+#endif
 
 interface Math {
     /**
@@ -771,22 +789,30 @@ interface RegExpConstructor {
 interface Map<K, V> {
     clear(): void;
     delete(key: K): boolean;
+#if TARGET_ITERABLES
     entries(): IterableIterator<[K, V]>;
+#endif
     forEach(callbackfn: (value: V, index: K, map: Map<K, V>) => void, thisArg?: any): void;
     get(key: K): V;
     has(key: K): boolean;
+#if TARGET_ITERABLES
     keys(): IterableIterator<K>;
+#endif
     set(key: K, value?: V): Map<K, V>;
     size: number;
+#if TARGET_ITERABLES
     values(): IterableIterator<V>;
     [Symbol.iterator]():IterableIterator<[K,V]>;
+#endif
     [Symbol.toStringTag]: string;
 }
 
 interface MapConstructor {
     new (): Map<any, any>;
     new <K, V>(): Map<K, V>;
+#if TARGET_ITERABLES
     new <K, V>(iterable: Iterable<[K, V]>): Map<K, V>;
+#endif
     prototype: Map<any, any>;
 }
 declare var Map: MapConstructor;
@@ -803,7 +829,9 @@ interface WeakMap<K, V> {
 interface WeakMapConstructor {
     new (): WeakMap<any, any>;
     new <K, V>(): WeakMap<K, V>;
+#if TARGET_ITERABLES
     new <K, V>(iterable: Iterable<[K, V]>): WeakMap<K, V>;
+#endif
     prototype: WeakMap<any, any>;
 }
 declare var WeakMap: WeakMapConstructor;
@@ -812,20 +840,28 @@ interface Set<T> {
     add(value: T): Set<T>;
     clear(): void;
     delete(value: T): boolean;
+#if TARGET_ITERABLES
     entries(): IterableIterator<[T, T]>;
+#endif
     forEach(callbackfn: (value: T, index: T, set: Set<T>) => void, thisArg?: any): void;
     has(value: T): boolean;
+#if TARGET_ITERABLES
     keys(): IterableIterator<T>;
+#endif
     size: number;
+#if TARGET_ITERABLES
     values(): IterableIterator<T>;
     [Symbol.iterator]():IterableIterator<T>;
+#endif
     [Symbol.toStringTag]: string;
 }
 
 interface SetConstructor {
     new (): Set<any>;
     new <T>(): Set<T>;
+#if TARGET_ITERABLES
     new <T>(iterable: Iterable<T>): Set<T>;
+#endif
     prototype: Set<any>;
 }
 declare var Set: SetConstructor;
@@ -841,7 +877,9 @@ interface WeakSet<T> {
 interface WeakSetConstructor {
     new (): WeakSet<any>;
     new <T>(): WeakSet<T>;
+#if TARGET_ITERABLES
     new <T>(iterable: Iterable<T>): WeakSet<T>;
+#endif
     prototype: WeakSet<any>;
 }
 declare var WeakSet: WeakSetConstructor;
@@ -864,11 +902,13 @@ interface DataView {
     [Symbol.toStringTag]: string;
 }
 
+//TODO: all XArrayConstructor defs below - add new/from defns with ArrayLike<> instead of Iterable<>??
 /**
   * A typed array of 8-bit integer values. The contents are initialized to 0. If the requested 
   * number of bytes could not be allocated an exception is raised.
   */
 interface Int8Array {
+#if TARGET_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -882,9 +922,11 @@ interface Int8Array {
       */
     values(): IterableIterator<number>;
     [Symbol.iterator](): IterableIterator<number>;
+#endif
 }
 
 interface Int8ArrayConstructor {
+#if TARGET_ITERABLES
     new (elements: Iterable<number>): Int8Array;
 
     /**
@@ -894,6 +936,7 @@ interface Int8ArrayConstructor {
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
     from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Int8Array;
+#endif
 }
 
 /**
@@ -901,6 +944,7 @@ interface Int8ArrayConstructor {
   * requested number of bytes could not be allocated an exception is raised.
   */
 interface Uint8Array {
+#if TARGET_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -914,9 +958,11 @@ interface Uint8Array {
       */
     values(): IterableIterator<number>;
     [Symbol.iterator](): IterableIterator<number>;
+#endif
 }
 
 interface Uint8ArrayConstructor {
+#if TARGET_ITERABLES
     new (elements: Iterable<number>): Uint8Array;
 
     /**
@@ -926,6 +972,7 @@ interface Uint8ArrayConstructor {
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
     from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Uint8Array;
+#endif
 }
 
 /**
@@ -933,6 +980,7 @@ interface Uint8ArrayConstructor {
   * If the requested number of bytes could not be allocated an exception is raised.
   */
 interface Uint8ClampedArray {
+#if TARGET_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -949,9 +997,11 @@ interface Uint8ClampedArray {
     values(): IterableIterator<number>;
 
     [Symbol.iterator](): IterableIterator<number>;
+#endif
 }
 
 interface Uint8ClampedArrayConstructor {
+#if TARGET_ITERABLES
     new (elements: Iterable<number>): Uint8ClampedArray;
 
 
@@ -962,6 +1012,7 @@ interface Uint8ClampedArrayConstructor {
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
     from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Uint8ClampedArray;
+#endif
 }
 
 /**
@@ -969,6 +1020,7 @@ interface Uint8ClampedArrayConstructor {
   * requested number of bytes could not be allocated an exception is raised.
   */
 interface Int16Array {
+#if TARGET_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -986,9 +1038,11 @@ interface Int16Array {
 
 
     [Symbol.iterator](): IterableIterator<number>;
+#endif
 }
 
 interface Int16ArrayConstructor {
+#if TARGET_ITERABLES
     new (elements: Iterable<number>): Int16Array;
 
     /**
@@ -998,6 +1052,7 @@ interface Int16ArrayConstructor {
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
     from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Int16Array;
+#endif
 }
 
 /**
@@ -1005,6 +1060,7 @@ interface Int16ArrayConstructor {
   * requested number of bytes could not be allocated an exception is raised.
   */
 interface Uint16Array {
+#if TARGET_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -1018,9 +1074,11 @@ interface Uint16Array {
       */
     values(): IterableIterator<number>;
     [Symbol.iterator](): IterableIterator<number>;
+#endif
 }
 
 interface Uint16ArrayConstructor {
+#if TARGET_ITERABLES
     new (elements: Iterable<number>): Uint16Array;
 
     /**
@@ -1030,6 +1088,7 @@ interface Uint16ArrayConstructor {
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
     from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Uint16Array;
+#endif
 }
 
 /**
@@ -1037,6 +1096,7 @@ interface Uint16ArrayConstructor {
   * requested number of bytes could not be allocated an exception is raised.
   */
 interface Int32Array {
+#if TARGET_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -1050,9 +1110,11 @@ interface Int32Array {
       */
     values(): IterableIterator<number>;
     [Symbol.iterator](): IterableIterator<number>;
+#endif
 }
 
 interface Int32ArrayConstructor {
+#if TARGET_ITERABLES
     new (elements: Iterable<number>): Int32Array;
 
     /**
@@ -1062,6 +1124,7 @@ interface Int32ArrayConstructor {
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
     from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Int32Array;
+#endif
 }
 
 /**
@@ -1069,6 +1132,7 @@ interface Int32ArrayConstructor {
   * requested number of bytes could not be allocated an exception is raised.
   */
 interface Uint32Array {
+#if TARGET_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -1082,9 +1146,11 @@ interface Uint32Array {
       */
     values(): IterableIterator<number>;
     [Symbol.iterator](): IterableIterator<number>;
+#endif
 }
 
 interface Uint32ArrayConstructor {
+#if TARGET_ITERABLES
     new (elements: Iterable<number>): Uint32Array;
 
     /**
@@ -1094,6 +1160,7 @@ interface Uint32ArrayConstructor {
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
     from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Uint32Array;
+#endif
 }
 
 /**
@@ -1101,6 +1168,7 @@ interface Uint32ArrayConstructor {
   * of bytes could not be allocated an exception is raised.
   */
 interface Float32Array {
+#if TARGET_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -1114,9 +1182,11 @@ interface Float32Array {
       */
     values(): IterableIterator<number>;
     [Symbol.iterator](): IterableIterator<number>;
+#endif
 }
 
 interface Float32ArrayConstructor {
+#if TARGET_ITERABLES
     new (elements: Iterable<number>): Float32Array;
 
     /**
@@ -1126,6 +1196,7 @@ interface Float32ArrayConstructor {
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
     from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Float32Array;
+#endif
 }
 
 /**
@@ -1133,6 +1204,7 @@ interface Float32ArrayConstructor {
   * number of bytes could not be allocated an exception is raised.
   */
 interface Float64Array {
+#if TARGET_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -1146,9 +1218,11 @@ interface Float64Array {
       */
     values(): IterableIterator<number>;
     [Symbol.iterator](): IterableIterator<number>;
+#endif
 }
 
 interface Float64ArrayConstructor {
+#if TARGET_ITERABLES
     new (elements: Iterable<number>): Float64Array;
 
     /**
@@ -1158,6 +1232,7 @@ interface Float64ArrayConstructor {
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
     from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Float64Array;
+#endif
 }
 
 interface ProxyHandler<T> {
@@ -1188,7 +1263,9 @@ declare namespace Reflect {
     function construct(target: Function, argumentsList: ArrayLike<any>, newTarget?: any): any;
     function defineProperty(target: any, propertyKey: PropertyKey, attributes: PropertyDescriptor): boolean;
     function deleteProperty(target: any, propertyKey: PropertyKey): boolean;
+#if TARGET_ITERABLES
     function enumerate(target: any): IterableIterator<any>;
+#endif
     function get(target: any, propertyKey: PropertyKey, receiver?: any): any;
     function getOwnPropertyDescriptor(target: any, propertyKey: PropertyKey): PropertyDescriptor;
     function getPrototypeOf(target: any): any;
@@ -1239,6 +1316,8 @@ interface PromiseConstructor {
      */
     new <T>(executor: (resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void): Promise<T>;
 
+// TODO: add ArrayLike overrides that work if no iterables
+#if TARGET_ITERABLES
     /**
      * Creates a Promise that is resolved with an array of results when all of the provided Promises 
      * resolve, or rejected when any Promise is rejected.
@@ -1254,6 +1333,7 @@ interface PromiseConstructor {
      * @returns A new Promise.
      */
     race<T>(values: Iterable<T | PromiseLike<T>>): Promise<T>;
+#endif
 
     /**
      * Creates a new rejected promise for the provided reason.

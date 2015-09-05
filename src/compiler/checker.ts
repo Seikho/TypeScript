@@ -43,14 +43,7 @@ namespace ts {
         let emptySymbols: SymbolTable = {};
 
         let compilerOptions = host.getCompilerOptions();
-        let languageVersion = compilerOptions.target || ScriptTarget.ES3;
-
-        // TODO: new... duplication with emitter.ts
-        let featureVersion = {                                                      // PREREQUISITES:
-            iterables: compilerOptions['target-iterables'] || languageVersion,      // (none)
-            forOf: compilerOptions['target-forOf'] || languageVersion,              // iterables
-            generators: compilerOptions['target-generators'] || languageVersion,    // iterables
-        };
+        let languageVersion = getLanguageVersion(compilerOptions);
 
         let emitResolver = createResolver();
 
@@ -2457,11 +2450,11 @@ namespace ts {
                 }
             });
             if (!elementTypes.length) {
-                return featureVersion.iterables >= ScriptTarget.ES6 ? createIterableType(anyType) : anyArrayType;
+                return languageVersion.iterables ? createIterableType(anyType) : anyArrayType;
             }
             else if (hasSpreadElement) {
                 let unionOfElements = getUnionType(elementTypes);
-                return featureVersion.iterables >= ScriptTarget.ES6 ? createIterableType(unionOfElements) : createArrayType(unionOfElements);
+                return languageVersion.iterables ? createIterableType(unionOfElements) : createArrayType(unionOfElements);
             }
 
             // If the pattern has at least one element, and no rest element, then it should imply a tuple type.
@@ -6320,7 +6313,7 @@ namespace ts {
             if (symbol === argumentsSymbol) {
                 let container = getContainingFunction(node);
                 if (container.kind === SyntaxKind.ArrowFunction) {
-                    if (languageVersion < ScriptTarget.ES6) {
+                    if (languageVersion.baseline < ScriptTarget.ES6) {
                         error(node, Diagnostics.The_arguments_object_cannot_be_referenced_in_an_arrow_function_in_ES3_and_ES5_Consider_using_a_standard_function_expression);
                     }
                 }
@@ -6355,7 +6348,7 @@ namespace ts {
         }
 
         function checkBlockScopedBindingCapturedInLoop(node: Identifier, symbol: Symbol): void {
-            if (languageVersion >= ScriptTarget.ES6 ||
+            if (languageVersion.baseline >= ScriptTarget.ES6 ||
                 (symbol.flags & SymbolFlags.BlockScopedVariable) === 0 ||
                 symbol.valueDeclaration.parent.kind === SyntaxKind.CatchClause) {
                 return;
@@ -6416,7 +6409,7 @@ namespace ts {
                 container = getThisContainer(container, /* includeArrowFunctions */ false);
 
                 // When targeting es6, arrow function lexically bind "this" so we do not need to do the work of binding "this" in emitted code
-                needToCaptureLexicalThis = (languageVersion < ScriptTarget.ES6);
+                needToCaptureLexicalThis = (languageVersion.baseline < ScriptTarget.ES6);
             }
 
             switch (container.kind) {
@@ -6479,7 +6472,7 @@ namespace ts {
                 // adjust the container reference in case if super is used inside arrow functions with arbitrary deep nesting                                    
                 while (container && container.kind === SyntaxKind.ArrowFunction) {
                     container = getSuperContainer(container, /*includeFunctions*/ true);
-                    needToCaptureLexicalThis = languageVersion < ScriptTarget.ES6;
+                    needToCaptureLexicalThis = languageVersion.baseline < ScriptTarget.ES6;
                 }
             }
             
@@ -6814,7 +6807,7 @@ namespace ts {
                 let index = indexOf(arrayLiteral.elements, node);
                 return getTypeOfPropertyOfContextualType(type, "" + index)
                     || getIndexTypeOfContextualType(type, IndexKind.Number)
-                    || (featureVersion.iterables >= ScriptTarget.ES6 ? getElementTypeOfIterable(type, /*errorNode*/ undefined) : undefined);
+                    || (languageVersion.iterables ? getElementTypeOfIterable(type, /*errorNode*/ undefined) : undefined);
             }
             return undefined;
         }
@@ -7040,7 +7033,7 @@ namespace ts {
                     // if there is no index type / iterated type.
                     let restArrayType = checkExpression((<SpreadElementExpression>e).expression, contextualMapper);
                     let restElementType = getIndexTypeOfType(restArrayType, IndexKind.Number) ||
-                        (featureVersion.iterables >= ScriptTarget.ES6 ? getElementTypeOfIterable(restArrayType, /*errorNode*/ undefined) : undefined);
+                        (languageVersion.iterables ? getElementTypeOfIterable(restArrayType, /*errorNode*/ undefined) : undefined);
                     if (restElementType) {
                         elementTypes.push(restElementType);
                     }
@@ -8862,7 +8855,7 @@ namespace ts {
         }
 
         function resolveNewExpression(node: NewExpression, candidatesOutArray: Signature[]): Signature {
-            if (node.arguments && languageVersion < ScriptTarget.ES5) {
+            if (node.arguments && languageVersion.baseline < ScriptTarget.ES5) {
                 let spreadIndex = getSpreadArgumentIndex(node.arguments);
                 if (spreadIndex >= 0) {
                     error(node.arguments[spreadIndex], Diagnostics.Spread_operator_in_new_expressions_is_only_available_when_targeting_ECMAScript_5_and_higher);
@@ -10380,7 +10373,7 @@ namespace ts {
                 }
 
                 if (node.type) {
-                    if (featureVersion.generators >= ScriptTarget.ES6 && isSyntacticallyValidGenerator(node)) {
+                    if (languageVersion.generators && isSyntacticallyValidGenerator(node)) {
                         let returnType = getTypeFromTypeNode(node.type);
                         if (returnType === voidType) {
                             error(node.type, Diagnostics.A_generator_cannot_have_a_void_type_annotation);
@@ -12012,7 +12005,7 @@ namespace ts {
                 return inputType;
             }
 
-            if (featureVersion.iterables >= ScriptTarget.ES6) {
+            if (languageVersion.iterables) {
                 return checkElementTypeOfIterable(inputType, errorNode);
             }
 
@@ -12191,7 +12184,7 @@ namespace ts {
          *   2. Some constituent is a string and target is less than ES5 (because in ES3 string is not indexable).
          */
         function checkElementTypeOfArrayOrString(arrayOrStringType: Type, errorNode: Node): Type {
-            Debug.assert(featureVersion.iterables < ScriptTarget.ES6);
+            Debug.assert(!languageVersion.iterables);
 
             // After we remove all types that are StringLike, we will know if there was a string constituent
             // based on whether the remaining type is the same as the initial type.
@@ -12200,7 +12193,8 @@ namespace ts {
 
             let reportedError = false;
             if (hasStringConstituent) {
-                if (languageVersion < ScriptTarget.ES5) {
+                // TODO: review this condition in light of granular targets
+                if (languageVersion.baseline < ScriptTarget.ES5) {
                     error(errorNode, Diagnostics.Using_a_string_in_a_for_of_statement_is_only_supported_in_ECMAScript_5_and_higher);
                     reportedError = true;
                 }
@@ -13304,7 +13298,7 @@ namespace ts {
                     }
                 }
                 else {
-                    if (languageVersion >= ScriptTarget.ES6 && !isInAmbientContext(node)) {
+                    if (languageVersion.baseline >= ScriptTarget.ES6 && !isInAmbientContext(node)) {
                         // Import equals declaration is deprecated in es6 or above
                         grammarErrorOnNode(node, Diagnostics.Import_assignment_cannot_be_used_when_targeting_ECMAScript_6_or_higher_Consider_using_import_Asterisk_as_ns_from_mod_import_a_from_mod_or_import_d_from_mod_instead);
                     }
@@ -13381,7 +13375,7 @@ namespace ts {
             checkExternalModuleExports(<SourceFile | ModuleDeclaration>container);
 
             if (node.isExportEquals && !isInAmbientContext(node)) {
-                if (languageVersion >= ScriptTarget.ES6) {
+                if (languageVersion.baseline >= ScriptTarget.ES6) {
                     // export assignment is deprecated in es6 or above
                     grammarErrorOnNode(node, Diagnostics.Export_assignment_cannot_be_used_when_targeting_ECMAScript_6_or_higher_Consider_using_export_default_instead);
                 }
@@ -13718,7 +13712,7 @@ namespace ts {
                     links.flags |= NodeCheckFlags.EmitAwaiter;
                 }
 
-                if (emitGenerator || (emitAwaiter && languageVersion < ScriptTarget.ES6)) {
+                if (emitGenerator || (emitAwaiter && languageVersion.baseline < ScriptTarget.ES6)) {
                     links.flags |= NodeCheckFlags.EmitGenerator;
                 }
 
@@ -14570,7 +14564,7 @@ namespace ts {
 
             // If we're in ES6 mode, load the TemplateStringsArray.
             // Otherwise, default to 'unknown' for the purposes of type checking in LS scenarios.
-            if (languageVersion >= ScriptTarget.ES6) {
+            if (languageVersion.baseline >= ScriptTarget.ES6) {
                 globalTemplateStringsArrayType = getGlobalType("TemplateStringsArray");
                 globalESSymbolType = getGlobalType("Symbol");
                 globalESSymbolConstructorSymbol = getGlobalValueSymbol("Symbol");
@@ -14584,7 +14578,7 @@ namespace ts {
                 globalESSymbolType = createAnonymousType(undefined, emptySymbols, emptyArray, emptyArray, undefined, undefined);
                 globalESSymbolConstructorSymbol = undefined;
             }
-            if (featureVersion.iterables >= ScriptTarget.ES6) {
+            if (languageVersion.iterables) {
                 globalIterableType = <GenericType>getGlobalType("Iterable", /*arity*/ 1);
                 globalIteratorType = <GenericType>getGlobalType("Iterator", /*arity*/ 1);
                 globalIterableIteratorType = <GenericType>getGlobalType("IterableIterator", /*arity*/ 1);
@@ -14628,7 +14622,7 @@ namespace ts {
             if (!nodeCanBeDecorated(node)) {
                 return grammarErrorOnFirstToken(node, Diagnostics.Decorators_are_not_valid_here);
             }
-            else if (languageVersion < ScriptTarget.ES5) {
+            else if (languageVersion.baseline < ScriptTarget.ES5) {
                 return grammarErrorOnFirstToken(node, Diagnostics.Decorators_are_only_available_when_targeting_ECMAScript_5_and_higher);
             }
             else if (node.kind === SyntaxKind.GetAccessor || node.kind === SyntaxKind.SetAccessor) {
@@ -14858,7 +14852,7 @@ namespace ts {
         }
 
         function checkGrammarAsyncModifier(node: Node, asyncModifier: Node): boolean {
-            if (languageVersion < ScriptTarget.ES6) {
+            if (languageVersion.baseline < ScriptTarget.ES6) {
                 return grammarErrorOnNode(asyncModifier, Diagnostics.Async_functions_are_only_available_when_targeting_ECMAScript_6_and_higher);
             }
 
@@ -15127,7 +15121,7 @@ namespace ts {
                 if (!node.body) {
                     return grammarErrorOnNode(node.asteriskToken, Diagnostics.An_overload_signature_cannot_be_declared_as_a_generator);
                 }
-                if (featureVersion.generators < ScriptTarget.ES6) {
+                if (!languageVersion.generators) {
                     return grammarErrorOnNode(node.asteriskToken, Diagnostics.Generators_are_only_available_when_targeting_ECMAScript_6_or_higher);
                 }
             }
@@ -15266,7 +15260,7 @@ namespace ts {
 
         function checkGrammarAccessor(accessor: MethodDeclaration): boolean {
             let kind = accessor.kind;
-            if (languageVersion < ScriptTarget.ES5) {
+            if (languageVersion.baseline < ScriptTarget.ES5) {
                 return grammarErrorOnNode(accessor.name, Diagnostics.Accessors_are_only_available_when_targeting_ECMAScript_5_and_higher);
             }
             else if (isInAmbientContext(accessor)) {
@@ -15459,7 +15453,7 @@ namespace ts {
                 }
             }
 
-            let checkLetConstNames = languageVersion >= ScriptTarget.ES6 && (isLet(node) || isConst(node));
+            let checkLetConstNames = languageVersion.baseline >= ScriptTarget.ES6 && (isLet(node) || isConst(node));
 
             // 1. LexicalDeclaration : LetOrConst BindingList ;
             // It is a Syntax Error if the BoundNames of BindingList contains "let".
@@ -15721,7 +15715,7 @@ namespace ts {
 
         function checkGrammarNumericLiteral(node: Identifier): boolean {
             // Grammar checking
-            if (node.flags & NodeFlags.OctalLiteral && languageVersion >= ScriptTarget.ES5) {
+            if (node.flags & NodeFlags.OctalLiteral && languageVersion.baseline >= ScriptTarget.ES5) {
                 return grammarErrorOnNode(node, Diagnostics.Octal_literals_are_not_available_when_targeting_ECMAScript_5_and_higher);
             }
         }

@@ -2052,6 +2052,9 @@ namespace ts {
         suppressExcessPropertyErrors?: boolean;
         suppressImplicitAnyIndexErrors?: boolean;
         target?: ScriptTarget;
+        targetIterables?: boolean;
+        targetForOf?: boolean;
+        targetGenerators?: boolean;
         version?: boolean;
         watch?: boolean;
         isolatedModules?: boolean;
@@ -2099,6 +2102,13 @@ namespace ts {
         ES5 = 1,
         ES6 = 2,
         Latest = ES6,
+    }
+
+    export interface LanguageVersion {
+        baseline: ScriptTarget;
+        iterables: boolean;
+        forOf: boolean;
+        generators: boolean;
     }
 
     export const enum LanguageVariant {

@@ -210,25 +210,19 @@ namespace ts {
             error: Diagnostics.Argument_for_target_option_must_be_ES3_ES5_or_ES6
         },
         {
-            name: "target-iterables",
-            type: { "es3": ScriptTarget.ES3, "es5": ScriptTarget.ES5, "es6": ScriptTarget.ES6 },
-            description: Diagnostics.Specify_ECMAScript_target_version_Colon_ES3_default_ES5_or_ES6_experimental,
-            paramType: Diagnostics.VERSION,
-            error: Diagnostics.Argument_for_target_option_must_be_ES3_ES5_or_ES6
+            name: "targetIterables",
+            type: "boolean",
+            description: Diagnostics.Enable_or_disable_iterables_language_feature,
         },
         {
-            name: "target-forOf",
-            type: { "es3": ScriptTarget.ES3, "es5": ScriptTarget.ES5, "es6": ScriptTarget.ES6 },
-            description: Diagnostics.Specify_ECMAScript_target_version_Colon_ES3_default_ES5_or_ES6_experimental,
-            paramType: Diagnostics.VERSION,
-            error: Diagnostics.Argument_for_target_option_must_be_ES3_ES5_or_ES6
+            name: "targetForOf",
+            type: "boolean",
+            description: Diagnostics.Enable_or_disable_for_of_language_feature,
         },
         {
-            name: "target-generators",
-            type: { "es3": ScriptTarget.ES3, "es5": ScriptTarget.ES5, "es6": ScriptTarget.ES6 },
-            description: Diagnostics.Specify_ECMAScript_target_version_Colon_ES3_default_ES5_or_ES6_experimental,
-            paramType: Diagnostics.VERSION,
-            error: Diagnostics.Argument_for_target_option_must_be_ES3_ES5_or_ES6
+            name: "targetGenerators",
+            type: "boolean",
+            description: Diagnostics.Enable_or_disable_generators_language_feature,
         },
         {
             name: "version",

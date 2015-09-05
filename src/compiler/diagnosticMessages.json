@@ -2270,6 +2270,18 @@
         "category": "Message",
         "code": 6072
     },
+    "Enable or disable 'iterables' language feature":  {
+        "category": "Message",
+        "code": 6073
+    },
+    "Enable or disable 'for..of' language feature":  {
+        "category": "Message",
+        "code": 6074
+    },
+    "Enable or disable 'generators' language feature":  {
+        "category": "Message",
+        "code": 6075
+    },
 
     "Variable '{0}' implicitly has an '{1}' type.": {
         "category": "Error",

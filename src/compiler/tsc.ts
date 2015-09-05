@@ -238,6 +238,10 @@ namespace ts {
                 compilerHost = createCompilerHost(compilerOptions);
                 hostGetSourceFile = compilerHost.getSourceFile;
                 compilerHost.getSourceFile = getSourceFile;
+
+                // Set preprocessor symbols
+                let preprocessorSymbols = getPreprocessorSymbolsFromCompilerOptions(compilerOptions);
+                setPreprocessorSymbols(preprocessorSymbols);
             }
 
             let compileResult = compile(rootFileNames, compilerOptions, compilerHost);
