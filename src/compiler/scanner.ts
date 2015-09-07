@@ -493,7 +493,18 @@ namespace ts {
           }
       }
 
+
+
+
+
+    // TODO: ======================================== PREPROCESSOR ========================================
+
     let preprocessorSymbols: string[] = [];
+
+    /* @internal */
+    export function getPreprocessorSymbols(): string[] {
+        return preprocessorSymbols;
+    }
 
     /* @internal */
     export function setPreprocessorSymbols(value: string[]) {
@@ -501,105 +512,206 @@ namespace ts {
     }
 
     function isPreprocessorTrivia(text: string, pos: number): boolean {
-        if (pos > 0 && !isLineBreak(text.charCodeAt(pos - 1))) return false;
-        if (isPreprocessorIfDirectiveStart(text, pos)) return true;
-        if (isPreprocessorEndifDirectiveStart(text, pos)) return true;
-        return false;
+        return scanPreprocessorDirectiveStart(text, pos) > pos;
     }
 
-    function isPreprocessorIfDirectiveStart(text: string, pos: number): boolean {
-        return text.length - pos >= 4
-            && text.charCodeAt(pos + 0) === CharacterCodes.hash
-            && text.charCodeAt(pos + 1) === CharacterCodes.i
-            && text.charCodeAt(pos + 2) === CharacterCodes.f
-            && text.charCodeAt(pos + 3) === CharacterCodes.space;
-    }
+    function scanPreprocessorDirectiveStart(text: string, pos: number): number {
 
-    function isPreprocessorEndifDirectiveStart(text: string, pos: number): boolean {
-        return text.length - pos >= 6
-            && text.charCodeAt(pos + 0) === CharacterCodes.hash
-            && text.charCodeAt(pos + 1) === CharacterCodes.e
-            && text.charCodeAt(pos + 2) === CharacterCodes.n
-            && text.charCodeAt(pos + 3) === CharacterCodes.d
-            && text.charCodeAt(pos + 4) === CharacterCodes.i
-            && text.charCodeAt(pos + 5) === CharacterCodes.f;
-    }
-
-    function isPreprocessorSymbolPart(ch: number): boolean {
-        return ch >= CharacterCodes.A && ch <= CharacterCodes.Z || ch >= CharacterCodes.a && ch <= CharacterCodes.z ||
-            ch >= CharacterCodes._0 && ch <= CharacterCodes._9 || ch === CharacterCodes.$ || ch === CharacterCodes._;
-    }
-
-    function scanPreprocessorTrivia(text: string, pos: number, nested = false, error?: ErrorCallback): number {
+        // A preprocessor directive begins with a hash
+        if (text.charCodeAt(pos) !== CharacterCodes.hash) return pos;
         let startPos = pos;
-        if (isPreprocessorIfDirectiveStart(text, pos)) {
-            pos += 4;
 
-            // scan the preprocessor symbol
-            let preprocessorSymbolStart = pos;
-            while (pos < text.length) {
-                let ch = text.charCodeAt(pos);
-                if (!isPreprocessorSymbolPart(ch)) break;
-                if (preprocessorSymbolStart === pos && isDigit(ch)) break;
-                pos++;
-            }
-            let preprocessorSymbol = text.substring(preprocessorSymbolStart, pos);
-            if (error && preprocessorSymbol.length === 0) {
-                error(Diagnostics.if_preprocessor_directive_must_specify_an_identifier, pos - startPos);
-            }
-            if (error && pos < text.length && !isLineBreak(text.charCodeAt(pos))) {
-                error(Diagnostics.Unexpected_characters_found_after_preprocessor_directive, pos - startPos);
-            }
-
-            // If the preprocessor symbol is defined OR if we scanning nested directives, we are done
-            if (preprocessorSymbols.indexOf(preprocessorSymbol) !== -1 || nested) {
-                return pos;
-            }
-
-            // The preprocessor symbol is not defined.
-            // Skip everything down to and including the matching #endif line.
-            let depth = 1;
-            let startSkipPos = pos;
-            while (true) {
-
-                // Skip to start of next line or EOF
-                // TODO: account for multiline comments and template strings? They could have #if/#endif on a line start. Ignore those?
-                //       - well this is a *preprocessing* step so it makes sense to process directives *before* comments and strings, so leave as-is?
-                while (pos < text.length && !isLineBreak(text.charCodeAt(pos))) {
-                    pos++;
-                }
-                if (pos === text.length) break;
-                pos++;
-
-                // Count nested #if and #endif directives until matching #endif is found
-                if (isPreprocessorIfDirectiveStart(text, pos)) {
-                    pos = scanPreprocessorTrivia(text, pos, /*nested*/ true);
-                    depth++;
-                }
-                if (isPreprocessorEndifDirectiveStart(text, pos)) {
-                    pos = scanPreprocessorTrivia(text, pos, /*nested*/ true);
-                    depth--;
-                }
-                if (depth === 0) break;
-            }
-
-            if (error && depth > 0) {
-                error(Diagnostics.if_preprocessor_directive_has_no_matching_endif, startSkipPos - startPos);
-            }
-            if (error && pos < text.length && !isLineBreak(text.charCodeAt(pos))) {
-                error(Diagnostics.Unexpected_characters_found_after_preprocessor_directive, pos - startPos);
-            }
-
-        }
-        else if (isPreprocessorEndifDirectiveStart(text, pos)) {
-            pos += 6;
-            if (error && pos < text.length && !isLineBreak(text.charCodeAt(pos))) {
-                error(Diagnostics.Unexpected_characters_found_after_preprocessor_directive, pos - startPos);
-            }
+        // A preprocessor directive has nothing preceding it on the same line, except possibly whitespace
+        var ch: number;
+        while (pos > 0 && !isLineBreak(ch = text.charCodeAt(pos))) {
+            if (!isWhiteSpace(ch)) return startPos;
+            pos--;
         }
 
+        // The hash is followed by a directive identifier
+        pos = scanPreprocessorIdentifier(text, startPos + 1);
+        return pos > startPos + 1 ? pos : startPos;
+    }
+
+    function isRestOfPreprocessorDirectiveLineTrivia(text: string, pos: number): boolean {
+        // TODO (yortus) allow a multiline comment to start immediately after a preprocessor directive (on the same line)?
+        while (pos < text.length) {
+            let ch = text.charCodeAt(pos);
+            if (isLineBreak(ch)) return true;
+            if (ch === CharacterCodes.slash && text.charCodeAt(pos + 1) === CharacterCodes.slash) return true;
+            if (!isWhiteSpace(ch)) return false;
+            pos++;
+        }
+        return true;
+    }
+
+    function scanPreprocessorIdentifier(text: string, pos: number): number {
+        if (pos < text.length && isIdentifierStart(text.charCodeAt(pos), ScriptTarget.Latest)) {
+            pos++;
+            while (pos < text.length && isIdentifierPart(text.charCodeAt(pos), ScriptTarget.Latest)) pos++;
+        }
         return pos;
     }
+
+    function scanPreprocessorTrivia(text: string, pos: number, error?: ErrorCallback): number {
+
+        // Scan the start of the preprocessor directive up to the directive identifier
+        let startPos = pos;
+        pos = scanPreprocessorDirectiveStart(text, pos);
+        if (pos - startPos < 2) {
+            // TODO: if (error)... Unrecognised preprocessor directive
+            return startPos;
+        }
+        let directive = text.substring(startPos + 1, pos);
+
+        switch (directive) {
+            case 'if':
+                // Scan the preprocessor symbol immediately after the #if
+                while (pos < text.length && isWhiteSpace(text.charCodeAt(pos))) pos++;
+                let preprocessorSymbolPos = pos;
+                pos = scanPreprocessorIdentifier(text, pos);
+                let preprocessorSymbol = text.substring(preprocessorSymbolPos, pos);
+
+                // If the preprocessor symbol is defined, return now to indicate the end of the trivia.
+                if (preprocessorSymbols.indexOf(preprocessorSymbol) !== -1) {
+                    if (isRestOfPreprocessorDirectiveLineTrivia(text, pos)) return pos;
+                    // TODO: if (error)... A preprocessor directive must be the only instruction on a line
+                    return startPos;
+                }
+
+                // The preprocessor symbol is not defined. Skip everything until the matching #endif,
+                // including any nested preprocessor directives. This means forward-scanning for valid
+                // #if and #endif preprocessor directives, and tracking nesting depth.
+                // We must also keep track of whether we are inside a multiline comment or multiline
+                // string, to avoid false recognition of an otherwise valid preprocessor directive there.
+                let depth = 1;
+                let inComment = false;
+                let inString = false;
+                while (true) {
+
+                    // Scan to the next hash that is not inside a multiline comment or string
+                    while (pos < text.length) {
+                        let ch = text.charCodeAt(pos);
+                        switch (ch) {
+                            case CharacterCodes.slash:
+                                if (text.charCodeAt(pos + 1) !== CharacterCodes.asterisk) break;
+                                if (!inComment && !inString) inComment = true;
+                                break;
+                            case CharacterCodes.asterisk:
+                                if (text.charCodeAt(pos + 1) !== CharacterCodes.slash) break;
+                                if (inComment) inComment = false;
+                                break;
+                            case CharacterCodes.backtick:
+                                if (inComment) break;
+                                if (inString && text.charCodeAt(pos - 1) === CharacterCodes.backslash) break;
+                                inString = !inString;
+                                break;
+                        }
+                        if (ch === CharacterCodes.hash && !inComment && !inString) break;
+                        pos++;
+                    }
+
+                    // Check for a valid #if or #endif directive, and adjust nesting depth accordingly
+                    pos++;
+                    let directivePos = pos;
+                    pos = scanPreprocessorIdentifier(text, pos);
+                    directive = text.substring(directivePos, pos);
+                    if (directive === 'if' && directive !== 'endif') continue;
+                    depth += directive === 'if' ? 1 : -1;
+                    if (depth > 0) continue;
+
+                    // Matching #endif found. It marks the end of the trivia.
+                    if (isRestOfPreprocessorDirectiveLineTrivia(text, pos)) return pos;
+                    // TODO: if (error)... A preprocessor directive must be the only instruction on a line
+                    return startPos;
+                }
+                break;
+
+            case 'endif':
+                if (isRestOfPreprocessorDirectiveLineTrivia(text, pos)) return pos;
+                // TODO: if (error)... A preprocessor directive must be the only instruction on a line
+                return startPos;
+                break;
+
+            default:
+                // TODO: if (error)... Unrecognised preprocessor directive
+                return startPos;
+        }
+    }
+
+
+
+
+    //function OLDscanPreprocessorTrivia(text: string, pos: number, nested = false, error?: ErrorCallback): number {
+    //    let startPos = pos;
+    //    if (isPreprocessorIfDirectiveStart(text, pos)) {
+    //        pos += 4;
+
+    //        // scan the preprocessor symbol
+    //        let preprocessorSymbolStart = pos;
+    //        while (pos < text.length) {
+    //            let ch = text.charCodeAt(pos);
+    //            if (!isPreprocessorSymbolPart(ch)) break;
+    //            if (preprocessorSymbolStart === pos && isDigit(ch)) break;
+    //            pos++;
+    //        }
+    //        let preprocessorSymbol = text.substring(preprocessorSymbolStart, pos);
+    //        if (error && preprocessorSymbol.length === 0) {
+    //            error(Diagnostics.if_preprocessor_directive_must_specify_an_identifier, pos - startPos);
+    //        }
+    //        if (error && pos < text.length && !isLineBreak(text.charCodeAt(pos))) {
+    //            error(Diagnostics.Unexpected_characters_found_after_preprocessor_directive, pos - startPos);
+    //        }
+
+    //        // If the preprocessor symbol is defined OR if we scanning nested directives, we are done
+    //        if (preprocessorSymbols.indexOf(preprocessorSymbol) !== -1 || nested) {
+    //            return pos;
+    //        }
+
+    //        // The preprocessor symbol is not defined.
+    //        // Skip everything down to and including the matching #endif line.
+    //        let depth = 1;
+    //        let startSkipPos = pos;
+    //        while (true) {
+
+    //            // Skip to start of next line or EOF
+    //            // TODO: account for multiline comments and template strings? They could have #if/#endif on a line start. Ignore those?
+    //            //       - well this is a *preprocessing* step so it makes sense to process directives *before* comments and strings, so leave as-is?
+    //            while (pos < text.length && !isLineBreak(text.charCodeAt(pos))) {
+    //                pos++;
+    //            }
+    //            if (pos === text.length) break;
+    //            pos++;
+
+    //            // Count nested #if and #endif directives until matching #endif is found
+    //            if (isPreprocessorIfDirectiveStart(text, pos)) {
+    //                pos = scanPreprocessorTrivia(text, pos, /*nested*/ true);
+    //                depth++;
+    //            }
+    //            if (isPreprocessorEndifDirectiveStart(text, pos)) {
+    //                pos = scanPreprocessorTrivia(text, pos, /*nested*/ true);
+    //                depth--;
+    //            }
+    //            if (depth === 0) break;
+    //        }
+
+    //        if (error && depth > 0) {
+    //            error(Diagnostics.if_preprocessor_directive_has_no_matching_endif, startSkipPos - startPos);
+    //        }
+    //        if (error && pos < text.length && !isLineBreak(text.charCodeAt(pos))) {
+    //            error(Diagnostics.Unexpected_characters_found_after_preprocessor_directive, pos - startPos);
+    //        }
+
+    //    }
+    //    else if (isPreprocessorEndifDirectiveStart(text, pos)) {
+    //        pos += 6;
+    //        if (error && pos < text.length && !isLineBreak(text.charCodeAt(pos))) {
+    //            error(Diagnostics.Unexpected_characters_found_after_preprocessor_directive, pos - startPos);
+    //        }
+    //    }
+
+    //    return pos;
+    //}
 
       // All conflict markers consist of the same character repeated seven times.  If it is
       // a <<<<<<< or >>>>>>> marker then it is also followd by a space.
@@ -1254,7 +1366,7 @@ namespace ts {
 
                 // Special handling for preprocessor directives #if and #endif
                 if (ch === CharacterCodes.hash && isPreprocessorTrivia(text, pos)) {
-                    pos = scanPreprocessorTrivia(text, pos, false, error);
+                    pos = scanPreprocessorTrivia(text, pos, error);
                     if (skipTrivia) {
                         continue;
                     }
