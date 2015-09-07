@@ -2443,16 +2443,20 @@
       "code": 17005
     },
 
-    "#if preprocessor directive must specify an identifier": {
+    "Invalid preprocessor expression": {
         "category":  "Error",
         "code": 18000
     },
-    "Unexpected characters found after preprocessor directive": {
+    "Single line comment or end of line expected": {
         "category":  "Error",
-        "code": 18002
+        "code": 18001
     },
     "#if preprocessor directive has no matching #endif": {
         "category":  "Error",
-        "code": 18004
+        "code": 18002
+    },
+    "Unexpected preprocessor directive": {
+        "category":  "Error",
+        "code": 18003
     }
 }

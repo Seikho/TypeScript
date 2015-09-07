@@ -612,8 +612,9 @@ namespace ts {
         JSX_attribute_expected: { code: 17003, category: DiagnosticCategory.Error, key: "JSX attribute expected." },
         Cannot_use_JSX_unless_the_jsx_flag_is_provided: { code: 17004, category: DiagnosticCategory.Error, key: "Cannot use JSX unless the '--jsx' flag is provided." },
         A_constructor_cannot_contain_a_super_call_when_its_class_extends_null: { code: 17005, category: DiagnosticCategory.Error, key: "A constructor cannot contain a 'super' call when its class extends 'null'" },
-        if_preprocessor_directive_must_specify_an_identifier: { code: 18000, category: DiagnosticCategory.Error, key: "#if preprocessor directive must specify an identifier" },
-        Unexpected_characters_found_after_preprocessor_directive: { code: 18002, category: DiagnosticCategory.Error, key: "Unexpected characters found after preprocessor directive" },
-        if_preprocessor_directive_has_no_matching_endif: { code: 18004, category: DiagnosticCategory.Error, key: "#if preprocessor directive has no matching #endif" },
+        Invalid_preprocessor_expression: { code: 18000, category: DiagnosticCategory.Error, key: "Invalid preprocessor expression" },
+        Single_line_comment_or_end_of_line_expected: { code: 18001, category: DiagnosticCategory.Error, key: "Single line comment or end of line expected" },
+        if_preprocessor_directive_has_no_matching_endif: { code: 18002, category: DiagnosticCategory.Error, key: "#if preprocessor directive has no matching #endif" },
+        Unexpected_preprocessor_directive: { code: 18003, category: DiagnosticCategory.Error, key: "Unexpected preprocessor directive" },
     };
 }
