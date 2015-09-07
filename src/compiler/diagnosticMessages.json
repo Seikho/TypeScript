@@ -2270,6 +2270,14 @@
         "category": "Message",
         "code": 6072
     },
+    "Define one or more preprocessor symbols, separated by commas.": {
+        "category": "Message",
+        "code":  6073
+    },
+    "SYMBOLS": {
+        "category": "Message",
+        "code": 6074
+    },
 
     "Variable '{0}' implicitly has an '{1}' type.": {
         "category": "Error",

@@ -570,6 +570,8 @@ namespace ts {
         Initializes_a_TypeScript_project_and_creates_a_tsconfig_json_file: { code: 6070, category: DiagnosticCategory.Message, key: "Initializes a TypeScript project and creates a tsconfig.json file." },
         Successfully_created_a_tsconfig_json_file: { code: 6071, category: DiagnosticCategory.Message, key: "Successfully created a tsconfig.json file." },
         Suppress_excess_property_checks_for_object_literals: { code: 6072, category: DiagnosticCategory.Message, key: "Suppress excess property checks for object literals." },
+        Define_one_or_more_preprocessor_symbols_separated_by_commas: { code: 6073, category: DiagnosticCategory.Message, key: "Define one or more preprocessor symbols, separated by commas." },
+        SYMBOLS: { code: 6074, category: DiagnosticCategory.Message, key: "SYMBOLS" },
         Variable_0_implicitly_has_an_1_type: { code: 7005, category: DiagnosticCategory.Error, key: "Variable '{0}' implicitly has an '{1}' type." },
         Parameter_0_implicitly_has_an_1_type: { code: 7006, category: DiagnosticCategory.Error, key: "Parameter '{0}' implicitly has an '{1}' type." },
         Member_0_implicitly_has_an_1_type: { code: 7008, category: DiagnosticCategory.Error, key: "Member '{0}' implicitly has an '{1}' type." },

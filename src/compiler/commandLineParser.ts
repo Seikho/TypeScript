@@ -244,7 +244,13 @@ namespace ts {
                 "classic": ModuleResolutionKind.Classic
             },
             description: Diagnostics.Specifies_module_resolution_strategy_Colon_node_Node_or_classic_TypeScript_pre_1_6
-        }        
+        },
+        {
+            name: "define",
+            type: "string",
+            description: Diagnostics.Define_one_or_more_preprocessor_symbols_separated_by_commas,
+            paramType: Diagnostics.SYMBOLS
+        }
     ];
 
     /* @internal */
