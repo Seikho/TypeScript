@@ -2396,16 +2396,20 @@ namespace ts {
     }
 
     export function getPreprocessorSymbolsFromCompilerOptions(compilerOptions: CompilerOptions): string[] {
-        var symbols: string[] = [];
+
+        // Start with preprocessor symbols directly defined via the 'define' compiler option
+        let preprocessorSymbols = ('dummy,' + compilerOptions.define).split(',').slice(1);
+
+        // Add a preprocessor symbol for each target feature that is supported
         for (let key in compilerOptions) {
             if (!compilerOptions.hasOwnProperty(key)) continue;
             if (key.indexOf('target') === 0 && key.length > 6) {
                 if (compilerOptions[key]) {
-                    symbols.push(toUpperSnakeCase(key));
+                    preprocessorSymbols.push(toUpperSnakeCase(key));
                 }
             }
         }
-        return symbols;
+        return preprocessorSymbols;
     }
 
     export function toUpperSnakeCase(identifier: string): string {
