@@ -523,6 +523,7 @@ namespace ts {
 
         // A preprocessor directive has nothing preceding it on the same line, except possibly whitespace
         var ch: number;
+        pos--;
         while (pos > 0 && !isLineBreak(ch = text.charCodeAt(pos))) {
             if (!isWhiteSpace(ch)) return startPos;
             pos--;
