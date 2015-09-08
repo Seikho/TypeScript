@@ -2386,7 +2386,7 @@ namespace ts {
     }
 
     export function getLanguageVersion(compilerOptions: CompilerOptions): LanguageVersion {
-        var baseline = compilerOptions.target || ScriptTarget.ES3;
+        let baseline = compilerOptions.target || ScriptTarget.ES3;
         return {
             baseline,
             hasIterables: compilerOptions.targetHasIterables !== void 0 ? compilerOptions.targetHasIterables : baseline >= ScriptTarget.ES6,
@@ -2403,15 +2403,15 @@ namespace ts {
     export function getPreprocessorSymbolsFromCompilerOptions(compilerOptions: CompilerOptions): string[] {
 
         // Start with preprocessor symbols directly defined via the 'define' compiler option
-        let preprocessorSymbols = ('dummy,' + compilerOptions.define).split(',').slice(1);
+        let preprocessorSymbols = ("dummy," + compilerOptions.define).split(",").slice(1);
 
         // Add a preprocessor symbol for each target feature that is supported
         let languageVersion = getLanguageVersion(compilerOptions);
         for (let key in languageVersion) {
             if (!languageVersion.hasOwnProperty(key)) continue;
-            if (key.indexOf('has') === 0) {
+            if (key.indexOf("has") === 0) {
                 if (languageVersion[key]) {
-                    preprocessorSymbols.push(toUpperSnakeCase('targetHas' + key.slice(3)));
+                    preprocessorSymbols.push(toUpperSnakeCase("targetHas" + key.slice(3)));
                 }
             }
         }
@@ -2419,11 +2419,11 @@ namespace ts {
     }
 
     export function toUpperSnakeCase(identifier: string): string {
-        var result = '';
-        for (var i = 0; i < identifier.length; ++i) {
-            var c = identifier.charAt(i);
-            if (i > 0 && c >= 'A' && c <= 'Z') {
-                result += '_';
+        let result = "";
+        for (let i = 0; i < identifier.length; ++i) {
+            let c = identifier.charAt(i);
+            if (i > 0 && c >= "A" && c <= "Z") {
+                result += "_";
             }
             result += c.toUpperCase();
         }
