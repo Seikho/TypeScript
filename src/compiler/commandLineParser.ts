@@ -240,6 +240,11 @@ namespace ts {
             description: Diagnostics.Specify_whether_the_target_supports_ES6_block_scoped_variables,
         },
         {
+            name: "targetHasSymbols",
+            type: "boolean",
+            description: Diagnostics.Specify_whether_the_target_supports_ES6_symbols,
+        },
+        {
             name: "version",
             shortName: "v",
             type: "boolean",

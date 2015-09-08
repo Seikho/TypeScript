@@ -5050,7 +5050,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
                         break;
 
                     case TypeReferenceSerializationKind.ESSymbolType:
-                        if (languageVersion.baseline < ScriptTarget.ES6) {
+                        if (!languageVersion.hasSymbols) {
                             write("typeof Symbol === 'function' ? Symbol : Object");
                         }
                         else {

@@ -6472,7 +6472,7 @@ namespace ts {
                 // adjust the container reference in case if super is used inside arrow functions with arbitrary deep nesting                                    
                 while (container && container.kind === SyntaxKind.ArrowFunction) {
                     container = getSuperContainer(container, /*includeFunctions*/ true);
-                    needToCaptureLexicalThis = languageVersion.baseline < ScriptTarget.ES6;
+                    needToCaptureLexicalThis = !languageVersion.hasArrowFunctions;
                 }
             }
             
@@ -14564,31 +14564,20 @@ namespace ts {
 
             // If we're in ES6 mode, load the TemplateStringsArray.
             // Otherwise, default to 'unknown' for the purposes of type checking in LS scenarios.
-            if (languageVersion.baseline >= ScriptTarget.ES6) {
-                globalTemplateStringsArrayType = getGlobalType("TemplateStringsArray");
+            globalTemplateStringsArrayType = languageVersion.baseline >= ScriptTarget.ES6 ? getGlobalType("TemplateStringsArray") : unknownType;
+            if (languageVersion.hasSymbols) {
                 globalESSymbolType = getGlobalType("Symbol");
-                globalESSymbolConstructorSymbol = getGlobalValueSymbol("Symbol");
             }
             else {
-                globalTemplateStringsArrayType = unknownType;
-
                 // Consider putting Symbol interface in lib.d.ts. On the plus side, putting it in lib.d.ts would make it
                 // extensible for Polyfilling Symbols. But putting it into lib.d.ts could also break users that have
                 // a global Symbol already, particularly if it is a class.
                 globalESSymbolType = createAnonymousType(undefined, emptySymbols, emptyArray, emptyArray, undefined, undefined);
-                globalESSymbolConstructorSymbol = undefined;
             }
-            if (languageVersion.hasIterables) {
-                globalIterableType = <GenericType>getGlobalType("Iterable", /*arity*/ 1);
-                globalIteratorType = <GenericType>getGlobalType("Iterator", /*arity*/ 1);
-                globalIterableIteratorType = <GenericType>getGlobalType("IterableIterator", /*arity*/ 1);
-            }
-            else {
-                globalIterableType = emptyGenericType;
-                globalIteratorType = emptyGenericType;
-                globalIterableIteratorType = emptyGenericType;
-            }
-
+            globalESSymbolConstructorSymbol = languageVersion.hasSymbols ? getGlobalValueSymbol("Symbol") : undefined;
+            globalIterableType = languageVersion.hasIterables ? <GenericType>getGlobalType("Iterable", /*arity*/ 1) : emptyGenericType;
+            globalIteratorType = languageVersion.hasIterables ? <GenericType>getGlobalType("Iterator", /*arity*/ 1) : emptyGenericType;
+            globalIterableIteratorType = languageVersion.hasIterables ? <GenericType>getGlobalType("IterableIterator", /*arity*/ 1) : emptyGenericType;
             anyArrayType = createArrayType(anyType);
         }
 

@@ -1,5 +1,6 @@
 declare type PropertyKey = string | number | symbol;
 
+#if TARGET_HAS_SYMBOLS
 interface Symbol {
     /** Returns a string representation of an object. */
     toString(): string;
@@ -107,6 +108,7 @@ interface SymbolConstructor {
     unscopables: symbol;
 }
 declare var Symbol: SymbolConstructor;
+#endif // TARGET_HAS_SYMBOLS
 
 interface Object {
     /**
@@ -131,11 +133,13 @@ interface ObjectConstructor {
       */
     assign(target: any, ...sources: any[]): any;
 
+    #if TARGET_HAS_SYMBOLS
     /**
       * Returns an array of all symbol properties found directly on object o.
       * @param o Object to retrieve the symbols from.
       */
     getOwnPropertySymbols(o: any): symbol[];
+    #endif
 
     /**
       * Returns true if the values are the same value, false otherwise.
@@ -177,6 +181,7 @@ interface Function {
       */
     name: string;
 
+    #if TARGET_HAS_SYMBOLS
     /**
      * Determines whether the given value inherits from this function if this function was used
      * as a constructor function.
@@ -185,6 +190,7 @@ interface Function {
      * 'instanceof' by overriding this method.
      */
     [Symbol.hasInstance](value: any): boolean;
+    #endif
 }
 
 interface NumberConstructor {
@@ -255,11 +261,14 @@ interface NumberConstructor {
 
 interface Array<T> {
 
+    #if TARGET_HAS_SYMBOLS
     #if TARGET_HAS_ITERABLES
     /** Iterator */
     [Symbol.iterator](): IterableIterator<T>;
     #endif
+    #endif
 
+    #if TARGET_HAS_SYMBOLS
     /**
      * Returns an object whose properties have the value 'true'
      * when they will be absent when used in a 'with' statement.
@@ -273,6 +282,7 @@ interface Array<T> {
         keys: boolean;
         values: boolean;
     };
+    #endif
 
     #if TARGET_HAS_ITERABLES
     /** 
@@ -335,11 +345,13 @@ interface Array<T> {
     copyWithin(target: number, start: number, end?: number): T[];
 }
 
+#if TARGET_HAS_SYMBOLS
 #if TARGET_HAS_ITERABLES
 interface IArguments {
     /** Iterator */
     [Symbol.iterator](): IterableIterator<any>;
 }
+#endif
 #endif
 
 interface ArrayConstructor {
@@ -384,9 +396,11 @@ interface ArrayConstructor {
 
 interface String {
 
+    #if TARGET_HAS_SYMBOLS
     #if TARGET_HAS_ITERABLES
     /** Iterator */
     [Symbol.iterator](): IterableIterator<string>;
+    #endif
     #endif
 
     /**
@@ -437,7 +451,7 @@ interface String {
     startsWith(searchString: string, position?: number): boolean;
 
     // Overloads for objects with methods of well-known symbols.
-
+    #if TARGET_HAS_SYMBOLS
     /**
       * Matches a string an object that supports being matched against, and returns an array containing the results of that search.
       * @param matcher An object that supports being matched against.
@@ -470,6 +484,7 @@ interface String {
       * @param limit A value used to limit the number of elements returned in the array.
       */
     split(splitter: { [Symbol.split](string: string, limit?: number): string[]; }, limit?: number): string[];
+    #endif // TARGET_HAS_SYMBOLS
 
     /**
       * Returns an <a> HTML anchor element and sets the name attribute to the text value
@@ -547,13 +562,17 @@ interface Iterator<T> {
 }
 
 interface Iterable<T> {
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): Iterator<T>;
+    #endif
 }
 
 interface IterableIterator<T> extends Iterator<T> {
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<T>;
+    #endif
 }
-#endif
+#endif // TARGET_HAS_ITERABLES
 
 #if TARGET_HAS_GENERATORS
 interface GeneratorFunction extends Function {
@@ -570,7 +589,7 @@ interface GeneratorFunctionConstructor {
     prototype: GeneratorFunction;
 }
 declare var GeneratorFunction: GeneratorFunctionConstructor;
-#endif
+#endif // TARGET_HAS_GENERATORS
 
 interface Math {
     /**
@@ -683,9 +702,12 @@ interface Math {
       */
     cbrt(x: number): number;
 
+    #if TARGET_HAS_SYMBOLS
     [Symbol.toStringTag]: string;
+    #endif
 }
 
+#if TARGET_HAS_SYMBOLS
 interface Date {
     /**
      * Converts a Date object to a string.
@@ -709,8 +731,10 @@ interface Date {
      */
     [Symbol.toPrimitive](hint: string): string | number;
 }
+#endif // TARGET_HAS_SYMBOLS
 
 interface RegExp {
+    #if TARGET_HAS_SYMBOLS
     /**
       * Matches a string with this regular expression, and returns an array containing the results of
       * that search.
@@ -756,6 +780,7 @@ interface RegExp {
       * than 'limit' elements.
       */
     [Symbol.split](string: string, limit?: number): string[];
+    #endif // TARGET_HAS_SYMBOLS
 
     /**
       * Returns a string indicating the flags of the regular expression in question. This field is read-only.
@@ -784,9 +809,11 @@ interface RegExp {
     unicode: boolean;
 }
 
+#if TARGET_HAS_SYMBOLS
 interface RegExpConstructor {
     [Symbol.species](): RegExpConstructor;
 }
+#endif
 
 interface Map<K, V> {
     clear(): void;
@@ -801,10 +828,14 @@ interface Map<K, V> {
     entries(): IterableIterator<[K, V]>;
     keys(): IterableIterator<K>;
     values(): IterableIterator<V>;
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator]():IterableIterator<[K,V]>;
     #endif
+    #endif
 
+    #if TARGET_HAS_SYMBOLS
     [Symbol.toStringTag]: string;
+    #endif
 }
 
 interface MapConstructor {
@@ -825,7 +856,10 @@ interface WeakMap<K, V> {
     get(key: K): V;
     has(key: K): boolean;
     set(key: K, value?: V): WeakMap<K, V>;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.toStringTag]: string;
+    #endif
 }
 
 interface WeakMapConstructor {
@@ -852,10 +886,14 @@ interface Set<T> {
     entries(): IterableIterator<[T, T]>;
     keys(): IterableIterator<T>;
     values(): IterableIterator<T>;
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator]():IterableIterator<T>;
     #endif
+    #endif
 
+    #if TARGET_HAS_SYMBOLS
     [Symbol.toStringTag]: string;
+    #endif
 }
 
 interface SetConstructor {
@@ -875,7 +913,10 @@ interface WeakSet<T> {
     clear(): void;
     delete(value: T): boolean;
     has(value: T): boolean;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.toStringTag]: string;
+    #endif
 }
 
 interface WeakSetConstructor {
@@ -890,6 +931,7 @@ interface WeakSetConstructor {
 }
 declare var WeakSet: WeakSetConstructor;
 
+#if TARGET_HAS_SYMBOLS
 interface JSON {
     [Symbol.toStringTag]: string;
 }
@@ -907,6 +949,7 @@ interface ArrayBuffer {
 interface DataView {
     [Symbol.toStringTag]: string;
 }
+#endif // TARGET_HAS_SYMBOLS
 
 /**
   * A typed array of 8-bit integer values. The contents are initialized to 0. If the requested 
@@ -926,7 +969,10 @@ interface Int8Array {
       * Returns an list of values in the array
       */
     values(): IterableIterator<number>;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
     #endif
 }
 
@@ -974,7 +1020,10 @@ interface Uint8Array {
       * Returns an list of values in the array
       */
     values(): IterableIterator<number>;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
     #endif
 }
 
@@ -1025,7 +1074,9 @@ interface Uint8ClampedArray {
       */
     values(): IterableIterator<number>;
 
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
     #endif
 }
 
@@ -1076,8 +1127,9 @@ interface Int16Array {
       */
     values(): IterableIterator<number>;
 
-
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
     #endif
 }
 
@@ -1125,7 +1177,10 @@ interface Uint16Array {
       * Returns an list of values in the array
       */
     values(): IterableIterator<number>;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
     #endif
 }
 
@@ -1173,7 +1228,10 @@ interface Int32Array {
       * Returns an list of values in the array
       */
     values(): IterableIterator<number>;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
     #endif
 }
 
@@ -1221,7 +1279,10 @@ interface Uint32Array {
       * Returns an list of values in the array
       */
     values(): IterableIterator<number>;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
     #endif
 }
 
@@ -1269,7 +1330,10 @@ interface Float32Array {
       * Returns an list of values in the array
       */
     values(): IterableIterator<number>;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
     #endif
 }
 
@@ -1317,7 +1381,10 @@ interface Float64Array {
       * Returns an list of values in the array
       */
     values(): IterableIterator<number>;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
     #endif
 }
 
@@ -1414,7 +1481,10 @@ interface Promise<T> {
     catch(onrejected?: (reason: any) => T | PromiseLike<T>): Promise<T>;
     catch(onrejected?: (reason: any) => void): Promise<T>;
 
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.toStringTag]: string;
+    #endif
 }
 
 interface PromiseConstructor {
@@ -1494,7 +1564,9 @@ interface PromiseConstructor {
      */
     resolve(): Promise<void>;
 
+    #if TARGET_HAS_SYMBOLS
     [Symbol.species]: Function;
+    #endif
 }
 
 declare var Promise: PromiseConstructor;

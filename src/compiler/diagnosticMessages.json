@@ -2302,6 +2302,10 @@
         "category": "Message",
         "code": 6080
     },
+    "Specify whether the target supports ES6 symbols":  {
+        "category": "Message",
+        "code": 6081
+    },
 
     "Variable '{0}' implicitly has an '{1}' type.": {
         "category": "Error",

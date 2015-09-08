@@ -2061,6 +2061,7 @@ namespace ts {
         targetHasPromises?: boolean;
         targetHasArrowFunctions?: boolean;
         targetHasBlockScoping?: boolean;
+        targetHasSymbols?: boolean;
         version?: boolean;
         watch?: boolean;
         isolatedModules?: boolean;
@@ -2119,6 +2120,8 @@ namespace ts {
         hasPromises: boolean;
         hasArrowFunctions: boolean;
         hasBlockScoping: boolean;
+        hasSymbols: boolean;
+        [key: string]: ScriptTarget | boolean;
     }
 
     export const enum LanguageVariant {

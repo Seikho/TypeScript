@@ -2394,7 +2394,8 @@ namespace ts {
             hasGenerators: compilerOptions.targetHasGenerators !== void 0 ? compilerOptions.targetHasGenerators : baseline >= ScriptTarget.ES6,
             hasPromises: compilerOptions.targetHasPromises !== void 0 ? compilerOptions.targetHasPromises : baseline >= ScriptTarget.ES6,
             hasArrowFunctions: compilerOptions.targetHasArrowFunctions !== void 0 ? compilerOptions.targetHasArrowFunctions : baseline >= ScriptTarget.ES6,
-            hasBlockScoping: compilerOptions.targetHasBlockScoping !== void 0 ? compilerOptions.targetHasBlockScoping : baseline >= ScriptTarget.ES6
+            hasBlockScoping: compilerOptions.targetHasBlockScoping !== void 0 ? compilerOptions.targetHasBlockScoping : baseline >= ScriptTarget.ES6,
+            hasSymbols: compilerOptions.targetHasSymbols !== void 0 ? compilerOptions.targetHasSymbols : baseline >= ScriptTarget.ES6
         };
     }
 
@@ -2404,11 +2405,12 @@ namespace ts {
         let preprocessorSymbols = ('dummy,' + compilerOptions.define).split(',').slice(1);
 
         // Add a preprocessor symbol for each target feature that is supported
-        for (let key in compilerOptions) {
-            if (!compilerOptions.hasOwnProperty(key)) continue;
-            if (key.indexOf('target') === 0 && key.length > 6) {
-                if (compilerOptions[key]) {
-                    preprocessorSymbols.push(toUpperSnakeCase(key));
+        let languageVersion = getLanguageVersion(compilerOptions);
+        for (let key in languageVersion) {
+            if (!languageVersion.hasOwnProperty(key)) continue;
+            if (key.indexOf('has') === 0) {
+                if (languageVersion[key]) {
+                    preprocessorSymbols.push(toUpperSnakeCase('targetHas' + key.slice(3)));
                 }
             }
         }
