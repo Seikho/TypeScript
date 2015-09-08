@@ -2389,9 +2389,9 @@ namespace ts {
         var baseline = compilerOptions.target || ScriptTarget.ES3;
         return {
             baseline,
-            iterables: compilerOptions.targetIterables !== void 0 ? compilerOptions.targetIterables : baseline >= ScriptTarget.ES6,
-            forOf: compilerOptions.targetForOf !== void 0 ? compilerOptions.targetForOf : baseline >= ScriptTarget.ES6,
-            generators: compilerOptions.targetGenerators !== void 0 ? compilerOptions.targetGenerators : baseline >= ScriptTarget.ES6
+            hasIterables: compilerOptions.targetHasIterables !== void 0 ? compilerOptions.targetHasIterables : baseline >= ScriptTarget.ES6,
+            hasForOf: compilerOptions.targetHasForOf !== void 0 ? compilerOptions.targetHasForOf : baseline >= ScriptTarget.ES6,
+            hasGenerators: compilerOptions.targetHasGenerators !== void 0 ? compilerOptions.targetHasGenerators : baseline >= ScriptTarget.ES6
         };
     }
 

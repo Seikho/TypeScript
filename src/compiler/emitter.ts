@@ -1985,7 +1985,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
             }
 
             function emitMethod(node: MethodDeclaration) {
-                if (languageVersion.generators && node.asteriskToken) {
+                if (languageVersion.hasGenerators && node.asteriskToken) {
                     write("*");
                 }
 
@@ -2739,7 +2739,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
             }
 
             function emitForInOrForOfStatement(node: ForInStatement | ForOfStatement) {
-                if (!languageVersion.forOf && node.kind === SyntaxKind.ForOfStatement) {
+                if (!languageVersion.hasForOf && node.kind === SyntaxKind.ForOfStatement) {
                     return emitDownLevelForOfStatement(node);
                 }
 
@@ -3703,7 +3703,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
                     }
 
                     write("function");
-                    if (languageVersion.generators && node.asteriskToken) {
+                    if (languageVersion.hasGenerators && node.asteriskToken) {
                         write("*");
                     }
                     write(" ");

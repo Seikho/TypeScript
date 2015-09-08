@@ -2450,11 +2450,11 @@ namespace ts {
                 }
             });
             if (!elementTypes.length) {
-                return languageVersion.iterables ? createIterableType(anyType) : anyArrayType;
+                return languageVersion.hasIterables ? createIterableType(anyType) : anyArrayType;
             }
             else if (hasSpreadElement) {
                 let unionOfElements = getUnionType(elementTypes);
-                return languageVersion.iterables ? createIterableType(unionOfElements) : createArrayType(unionOfElements);
+                return languageVersion.hasIterables ? createIterableType(unionOfElements) : createArrayType(unionOfElements);
             }
 
             // If the pattern has at least one element, and no rest element, then it should imply a tuple type.
@@ -6807,7 +6807,7 @@ namespace ts {
                 let index = indexOf(arrayLiteral.elements, node);
                 return getTypeOfPropertyOfContextualType(type, "" + index)
                     || getIndexTypeOfContextualType(type, IndexKind.Number)
-                    || (languageVersion.iterables ? getElementTypeOfIterable(type, /*errorNode*/ undefined) : undefined);
+                    || (languageVersion.hasIterables ? getElementTypeOfIterable(type, /*errorNode*/ undefined) : undefined);
             }
             return undefined;
         }
@@ -7033,7 +7033,7 @@ namespace ts {
                     // if there is no index type / iterated type.
                     let restArrayType = checkExpression((<SpreadElementExpression>e).expression, contextualMapper);
                     let restElementType = getIndexTypeOfType(restArrayType, IndexKind.Number) ||
-                        (languageVersion.iterables ? getElementTypeOfIterable(restArrayType, /*errorNode*/ undefined) : undefined);
+                        (languageVersion.hasIterables ? getElementTypeOfIterable(restArrayType, /*errorNode*/ undefined) : undefined);
                     if (restElementType) {
                         elementTypes.push(restElementType);
                     }
@@ -10373,7 +10373,7 @@ namespace ts {
                 }
 
                 if (node.type) {
-                    if (languageVersion.generators && isSyntacticallyValidGenerator(node)) {
+                    if (languageVersion.hasGenerators && isSyntacticallyValidGenerator(node)) {
                         let returnType = getTypeFromTypeNode(node.type);
                         if (returnType === voidType) {
                             error(node.type, Diagnostics.A_generator_cannot_have_a_void_type_annotation);
@@ -12005,7 +12005,7 @@ namespace ts {
                 return inputType;
             }
 
-            if (languageVersion.iterables) {
+            if (languageVersion.hasIterables) {
                 return checkElementTypeOfIterable(inputType, errorNode);
             }
 
@@ -12184,7 +12184,7 @@ namespace ts {
          *   2. Some constituent is a string and target is less than ES5 (because in ES3 string is not indexable).
          */
         function checkElementTypeOfArrayOrString(arrayOrStringType: Type, errorNode: Node): Type {
-            Debug.assert(!languageVersion.iterables);
+            Debug.assert(!languageVersion.hasIterables);
 
             // After we remove all types that are StringLike, we will know if there was a string constituent
             // based on whether the remaining type is the same as the initial type.
@@ -14578,7 +14578,7 @@ namespace ts {
                 globalESSymbolType = createAnonymousType(undefined, emptySymbols, emptyArray, emptyArray, undefined, undefined);
                 globalESSymbolConstructorSymbol = undefined;
             }
-            if (languageVersion.iterables) {
+            if (languageVersion.hasIterables) {
                 globalIterableType = <GenericType>getGlobalType("Iterable", /*arity*/ 1);
                 globalIteratorType = <GenericType>getGlobalType("Iterator", /*arity*/ 1);
                 globalIterableIteratorType = <GenericType>getGlobalType("IterableIterator", /*arity*/ 1);
@@ -15121,7 +15121,7 @@ namespace ts {
                 if (!node.body) {
                     return grammarErrorOnNode(node.asteriskToken, Diagnostics.An_overload_signature_cannot_be_declared_as_a_generator);
                 }
-                if (!languageVersion.generators) {
+                if (!languageVersion.hasGenerators) {
                     return grammarErrorOnNode(node.asteriskToken, Diagnostics.Generators_are_only_available_when_targeting_ECMAScript_6_or_higher);
                 }
             }

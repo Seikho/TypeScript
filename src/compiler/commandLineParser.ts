@@ -210,17 +210,17 @@ namespace ts {
             error: Diagnostics.Argument_for_target_option_must_be_ES3_ES5_or_ES6
         },
         {
-            name: "targetIterables",
+            name: "targetHasIterables",
             type: "boolean",
             description: Diagnostics.Enable_or_disable_iterables_language_feature,
         },
         {
-            name: "targetForOf",
+            name: "targetHasForOf",
             type: "boolean",
             description: Diagnostics.Enable_or_disable_for_of_language_feature,
         },
         {
-            name: "targetGenerators",
+            name: "targetHasGenerators",
             type: "boolean",
             description: Diagnostics.Enable_or_disable_generators_language_feature,
         },
