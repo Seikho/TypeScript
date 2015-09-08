@@ -518,7 +518,8 @@ namespace ts {
     function isPreprocessorTrivia(text: string, pos: number): boolean {
         // recognise a hash followed by any identifier as preprocessor trivia
         return text.charCodeAt(pos) === CharacterCodes.hash
-            && scanPreprocessorIdentifier(text, pos + 1) > pos + 1;
+            && pos + 1 < text.length
+            && isIdentifierStart(text.charCodeAt(pos + 1), ScriptTarget.Latest);
     }
 
     function scanPreprocessorTrivia(text: string, pos: number, error?: ErrorCallback): number {
