@@ -2278,15 +2278,15 @@
         "category": "Message",
         "code": 6074
     },
-    "Enable or disable 'iterables' language feature":  {
+    "Specify whether the target supports ES6 iterables":  {
         "category": "Message",
         "code": 6075
     },
-    "Enable or disable 'for..of' language feature":  {
+    "Specify whether the target supports ES6 'for..of' syntax":  {
         "category": "Message",
         "code": 6076
     },
-    "Enable or disable 'generators' language feature":  {
+    "Specify whether the target supports ES6 generators":  {
         "category": "Message",
         "code": 6077
     },

@@ -212,17 +212,17 @@ namespace ts {
         {
             name: "targetHasIterables",
             type: "boolean",
-            description: Diagnostics.Enable_or_disable_iterables_language_feature,
+            description: Diagnostics.Specify_whether_the_target_supports_ES6_iterables,
         },
         {
             name: "targetHasForOf",
             type: "boolean",
-            description: Diagnostics.Enable_or_disable_for_of_language_feature,
+            description: Diagnostics.Specify_whether_the_target_supports_ES6_for_of_syntax,
         },
         {
             name: "targetHasGenerators",
             type: "boolean",
-            description: Diagnostics.Enable_or_disable_generators_language_feature,
+            description: Diagnostics.Specify_whether_the_target_supports_ES6_generators,
         },
         {
             name: "version",
