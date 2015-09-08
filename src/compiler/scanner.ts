@@ -1334,7 +1334,7 @@ namespace ts {
                     }
                 }
 
-                // Special handling for preprocessor directives #if and #endif
+                // Special handling for preprocessor directives
                 if (ch === CharacterCodes.hash && isPreprocessorTrivia(text, pos)) {
                     pos = scanPreprocessorTrivia(text, pos, error);
                     if (skipTrivia) {
