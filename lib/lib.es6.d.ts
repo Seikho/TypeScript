@@ -3840,6 +3840,7 @@ interface Float64ArrayConstructor {
 declare var Float64Array: Float64ArrayConstructor;
 declare type PropertyKey = string | number | symbol;
 
+#if TARGET_HAS_SYMBOLS
 interface Symbol {
     /** Returns a string representation of an object. */
     toString(): string;
@@ -3890,11 +3891,13 @@ interface SymbolConstructor {
       */
     isConcatSpreadable: symbol;
 
+    #if TARGET_HAS_ITERABLES
     /** 
       * A method that returns the default iterator for an object. Called by the semantics of the 
       * for-of statement.
       */
     iterator: symbol;
+    #endif
 
     /**
       * A regular expression method that matches the regular expression against a string. Called 
@@ -3945,6 +3948,7 @@ interface SymbolConstructor {
     unscopables: symbol;
 }
 declare var Symbol: SymbolConstructor;
+#endif // TARGET_HAS_SYMBOLS
 
 interface Object {
     /**
@@ -3969,11 +3973,13 @@ interface ObjectConstructor {
       */
     assign(target: any, ...sources: any[]): any;
 
+    #if TARGET_HAS_SYMBOLS
     /**
       * Returns an array of all symbol properties found directly on object o.
       * @param o Object to retrieve the symbols from.
       */
     getOwnPropertySymbols(o: any): symbol[];
+    #endif
 
     /**
       * Returns true if the values are the same value, false otherwise.
@@ -4015,6 +4021,7 @@ interface Function {
       */
     name: string;
 
+    #if TARGET_HAS_SYMBOLS
     /**
      * Determines whether the given value inherits from this function if this function was used
      * as a constructor function.
@@ -4023,6 +4030,7 @@ interface Function {
      * 'instanceof' by overriding this method.
      */
     [Symbol.hasInstance](value: any): boolean;
+    #endif
 }
 
 interface NumberConstructor {
@@ -4092,9 +4100,15 @@ interface NumberConstructor {
 }
 
 interface Array<T> {
+
+    #if TARGET_HAS_SYMBOLS
+    #if TARGET_HAS_ITERABLES
     /** Iterator */
     [Symbol.iterator](): IterableIterator<T>;
+    #endif
+    #endif
 
+    #if TARGET_HAS_SYMBOLS
     /**
      * Returns an object whose properties have the value 'true'
      * when they will be absent when used in a 'with' statement.
@@ -4108,7 +4122,9 @@ interface Array<T> {
         keys: boolean;
         values: boolean;
     };
+    #endif
 
+    #if TARGET_HAS_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -4123,6 +4139,7 @@ interface Array<T> {
       * Returns an list of values in the array
       */
     values(): IterableIterator<T>;
+    #endif
 
     /** 
       * Returns the value of the first element in the array where predicate is true, and undefined 
@@ -4168,10 +4185,14 @@ interface Array<T> {
     copyWithin(target: number, start: number, end?: number): T[];
 }
 
+#if TARGET_HAS_SYMBOLS
+#if TARGET_HAS_ITERABLES
 interface IArguments {
     /** Iterator */
     [Symbol.iterator](): IterableIterator<any>;
 }
+#endif
+#endif
 
 interface ArrayConstructor {
     /**
@@ -4182,6 +4203,7 @@ interface ArrayConstructor {
       */
     from<T, U>(arrayLike: ArrayLike<T>, mapfn: (v: T, k: number) => U, thisArg?: any): Array<U>;
 
+    #if TARGET_HAS_ITERABLES
     /**
       * Creates an array from an iterable object.
       * @param iterable An iterable object to convert to an array.
@@ -4189,6 +4211,7 @@ interface ArrayConstructor {
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
     from<T, U>(iterable: Iterable<T>, mapfn: (v: T, k: number) => U, thisArg?: any): Array<U>;
+    #endif
 
     /**
       * Creates an array from an array-like object.
@@ -4196,11 +4219,13 @@ interface ArrayConstructor {
       */
     from<T>(arrayLike: ArrayLike<T>): Array<T>;
 
+    #if TARGET_HAS_ITERABLES
     /**
       * Creates an array from an iterable object.
       * @param iterable An iterable object to convert to an array.
       */
     from<T>(iterable: Iterable<T>): Array<T>;
+    #endif
 
     /**
       * Returns a new array from a set of elements.
@@ -4210,8 +4235,13 @@ interface ArrayConstructor {
 }
 
 interface String {
+
+    #if TARGET_HAS_SYMBOLS
+    #if TARGET_HAS_ITERABLES
     /** Iterator */
     [Symbol.iterator](): IterableIterator<string>;
+    #endif
+    #endif
 
     /**
       * Returns a nonnegative integer Number less than 1114112 (0x110000) that is the code point 
@@ -4261,7 +4291,7 @@ interface String {
     startsWith(searchString: string, position?: number): boolean;
 
     // Overloads for objects with methods of well-known symbols.
-
+    #if TARGET_HAS_SYMBOLS
     /**
       * Matches a string an object that supports being matched against, and returns an array containing the results of that search.
       * @param matcher An object that supports being matched against.
@@ -4294,6 +4324,7 @@ interface String {
       * @param limit A value used to limit the number of elements returned in the array.
       */
     split(splitter: { [Symbol.split](string: string, limit?: number): string[]; }, limit?: number): string[];
+    #endif // TARGET_HAS_SYMBOLS
 
     /**
       * Returns an <a> HTML anchor element and sets the name attribute to the text value
@@ -4358,6 +4389,7 @@ interface StringConstructor {
     raw(template: TemplateStringsArray, ...substitutions: any[]): string;
 }
 
+#if TARGET_HAS_ITERABLES
 interface IteratorResult<T> {
     done: boolean;
     value?: T;
@@ -4370,13 +4402,19 @@ interface Iterator<T> {
 }
 
 interface Iterable<T> {
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): Iterator<T>;
+    #endif
 }
 
 interface IterableIterator<T> extends Iterator<T> {
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<T>;
+    #endif
 }
+#endif // TARGET_HAS_ITERABLES
 
+#if TARGET_HAS_GENERATORS
 interface GeneratorFunction extends Function {
 
 }
@@ -4391,6 +4429,7 @@ interface GeneratorFunctionConstructor {
     prototype: GeneratorFunction;
 }
 declare var GeneratorFunction: GeneratorFunctionConstructor;
+#endif // TARGET_HAS_GENERATORS
 
 interface Math {
     /**
@@ -4503,9 +4542,12 @@ interface Math {
       */
     cbrt(x: number): number;
 
+    #if TARGET_HAS_SYMBOLS
     [Symbol.toStringTag]: string;
+    #endif
 }
 
+#if TARGET_HAS_SYMBOLS
 interface Date {
     /**
      * Converts a Date object to a string.
@@ -4529,8 +4571,10 @@ interface Date {
      */
     [Symbol.toPrimitive](hint: string): string | number;
 }
+#endif // TARGET_HAS_SYMBOLS
 
 interface RegExp {
+    #if TARGET_HAS_SYMBOLS
     /**
       * Matches a string with this regular expression, and returns an array containing the results of
       * that search.
@@ -4576,6 +4620,7 @@ interface RegExp {
       * than 'limit' elements.
       */
     [Symbol.split](string: string, limit?: number): string[];
+    #endif // TARGET_HAS_SYMBOLS
 
     /**
       * Returns a string indicating the flags of the regular expression in question. This field is read-only.
@@ -4604,29 +4649,43 @@ interface RegExp {
     unicode: boolean;
 }
 
+#if TARGET_HAS_SYMBOLS
 interface RegExpConstructor {
     [Symbol.species](): RegExpConstructor;
 }
+#endif
 
 interface Map<K, V> {
     clear(): void;
     delete(key: K): boolean;
-    entries(): IterableIterator<[K, V]>;
     forEach(callbackfn: (value: V, index: K, map: Map<K, V>) => void, thisArg?: any): void;
     get(key: K): V;
     has(key: K): boolean;
-    keys(): IterableIterator<K>;
     set(key: K, value?: V): Map<K, V>;
     size: number;
+
+    #if TARGET_HAS_ITERABLES
+    entries(): IterableIterator<[K, V]>;
+    keys(): IterableIterator<K>;
     values(): IterableIterator<V>;
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator]():IterableIterator<[K,V]>;
+    #endif
+    #endif
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.toStringTag]: string;
+    #endif
 }
 
 interface MapConstructor {
     new (): Map<any, any>;
     new <K, V>(): Map<K, V>;
+
+    #if TARGET_HAS_ITERABLES
     new <K, V>(iterable: Iterable<[K, V]>): Map<K, V>;
+    #endif
+
     prototype: Map<any, any>;
 }
 declare var Map: MapConstructor;
@@ -4637,13 +4696,20 @@ interface WeakMap<K, V> {
     get(key: K): V;
     has(key: K): boolean;
     set(key: K, value?: V): WeakMap<K, V>;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.toStringTag]: string;
+    #endif
 }
 
 interface WeakMapConstructor {
     new (): WeakMap<any, any>;
     new <K, V>(): WeakMap<K, V>;
+
+    #if TARGET_HAS_ITERABLES
     new <K, V>(iterable: Iterable<[K, V]>): WeakMap<K, V>;
+    #endif
+
     prototype: WeakMap<any, any>;
 }
 declare var WeakMap: WeakMapConstructor;
@@ -4652,20 +4718,32 @@ interface Set<T> {
     add(value: T): Set<T>;
     clear(): void;
     delete(value: T): boolean;
-    entries(): IterableIterator<[T, T]>;
     forEach(callbackfn: (value: T, index: T, set: Set<T>) => void, thisArg?: any): void;
     has(value: T): boolean;
-    keys(): IterableIterator<T>;
     size: number;
+
+    #if TARGET_HAS_ITERABLES
+    entries(): IterableIterator<[T, T]>;
+    keys(): IterableIterator<T>;
     values(): IterableIterator<T>;
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator]():IterableIterator<T>;
+    #endif
+    #endif
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.toStringTag]: string;
+    #endif
 }
 
 interface SetConstructor {
     new (): Set<any>;
     new <T>(): Set<T>;
+
+    #if TARGET_HAS_ITERABLES
     new <T>(iterable: Iterable<T>): Set<T>;
+    #endif
+
     prototype: Set<any>;
 }
 declare var Set: SetConstructor;
@@ -4675,17 +4753,25 @@ interface WeakSet<T> {
     clear(): void;
     delete(value: T): boolean;
     has(value: T): boolean;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.toStringTag]: string;
+    #endif
 }
 
 interface WeakSetConstructor {
     new (): WeakSet<any>;
     new <T>(): WeakSet<T>;
+
+    #if TARGET_HAS_ITERABLES
     new <T>(iterable: Iterable<T>): WeakSet<T>;
+    #endif
+
     prototype: WeakSet<any>;
 }
 declare var WeakSet: WeakSetConstructor;
 
+#if TARGET_HAS_SYMBOLS
 interface JSON {
     [Symbol.toStringTag]: string;
 }
@@ -4703,12 +4789,14 @@ interface ArrayBuffer {
 interface DataView {
     [Symbol.toStringTag]: string;
 }
+#endif // TARGET_HAS_SYMBOLS
 
 /**
   * A typed array of 8-bit integer values. The contents are initialized to 0. If the requested 
   * number of bytes could not be allocated an exception is raised.
   */
 interface Int8Array {
+    #if TARGET_HAS_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -4721,19 +4809,37 @@ interface Int8Array {
       * Returns an list of values in the array
       */
     values(): IterableIterator<number>;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
+    #endif
 }
 
 interface Int8ArrayConstructor {
+    new (elements: ArrayLike<number>): Int8Array;
+
+    #if TARGET_HAS_ITERABLES
     new (elements: Iterable<number>): Int8Array;
+    #endif
 
     /**
-      * Creates an array from an array-like or iterable object.
-      * @param arrayLike An array-like or iterable object to convert to an array.
+      * Creates an array from an array-like object.
+      * @param arrayLike An array-like object to convert to an array.
       * @param mapfn A mapping function to call on every element of the array.
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
-    from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Int8Array;
+    from(arrayLike: ArrayLike<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Int8Array;
+
+    #if TARGET_HAS_ITERABLES
+    /**
+      * Creates an array from an iterable object.
+      * @param iterable An iterable object to convert to an array.
+      * @param mapfn A mapping function to call on every element of the array.
+      * @param thisArg Value of 'this' used to invoke the mapfn.
+      */
+    from(iterable: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Int8Array;
+    #endif
 }
 
 /**
@@ -4741,6 +4847,7 @@ interface Int8ArrayConstructor {
   * requested number of bytes could not be allocated an exception is raised.
   */
 interface Uint8Array {
+    #if TARGET_HAS_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -4753,19 +4860,37 @@ interface Uint8Array {
       * Returns an list of values in the array
       */
     values(): IterableIterator<number>;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
+    #endif
 }
 
 interface Uint8ArrayConstructor {
+    new (elements: ArrayLike<number>): Uint8Array;
+
+    #if TARGET_HAS_ITERABLES
     new (elements: Iterable<number>): Uint8Array;
+    #endif
 
     /**
-      * Creates an array from an array-like or iterable object.
-      * @param arrayLike An array-like or iterable object to convert to an array.
+      * Creates an array from an array-like object.
+      * @param arrayLike An array-like object to convert to an array.
       * @param mapfn A mapping function to call on every element of the array.
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
-    from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Uint8Array;
+    from(arrayLike: ArrayLike<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Uint8Array;
+
+    #if TARGET_HAS_ITERABLES
+    /**
+      * Creates an array from an iterable object.
+      * @param iterable An iterable object to convert to an array.
+      * @param mapfn A mapping function to call on every element of the array.
+      * @param thisArg Value of 'this' used to invoke the mapfn.
+      */
+    from(iterable: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Uint8Array;
+    #endif
 }
 
 /**
@@ -4773,6 +4898,7 @@ interface Uint8ArrayConstructor {
   * If the requested number of bytes could not be allocated an exception is raised.
   */
 interface Uint8ClampedArray {
+    #if TARGET_HAS_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -4788,20 +4914,36 @@ interface Uint8ClampedArray {
       */
     values(): IterableIterator<number>;
 
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
+    #endif
 }
 
 interface Uint8ClampedArrayConstructor {
-    new (elements: Iterable<number>): Uint8ClampedArray;
+    new (elements: ArrayLike<number>): Uint8ClampedArray;
 
+    #if TARGET_HAS_ITERABLES
+    new (elements: Iterable<number>): Uint8ClampedArray;
+    #endif
 
     /**
-      * Creates an array from an array-like or iterable object.
-      * @param arrayLike An array-like or iterable object to convert to an array.
+      * Creates an array from an array-like object.
+      * @param arrayLike An array-like object to convert to an array.
       * @param mapfn A mapping function to call on every element of the array.
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
-    from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Uint8ClampedArray;
+    from(arrayLike: ArrayLike<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Uint8ClampedArray;
+
+    #if TARGET_HAS_ITERABLES
+    /**
+      * Creates an array from an iterable object.
+      * @param iterable An iterable object to convert to an array.
+      * @param mapfn A mapping function to call on every element of the array.
+      * @param thisArg Value of 'this' used to invoke the mapfn.
+      */
+    from(iterable: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Uint8ClampedArray;
+    #endif
 }
 
 /**
@@ -4809,6 +4951,7 @@ interface Uint8ClampedArrayConstructor {
   * requested number of bytes could not be allocated an exception is raised.
   */
 interface Int16Array {
+    #if TARGET_HAS_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -4824,20 +4967,36 @@ interface Int16Array {
       */
     values(): IterableIterator<number>;
 
-
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
+    #endif
 }
 
 interface Int16ArrayConstructor {
+    new (elements: ArrayLike<number>): Int16Array;
+
+    #if TARGET_HAS_ITERABLES
     new (elements: Iterable<number>): Int16Array;
+    #endif
 
     /**
-      * Creates an array from an array-like or iterable object.
-      * @param arrayLike An array-like or iterable object to convert to an array.
+      * Creates an array from an array-like object.
+      * @param arrayLike An array-like object to convert to an array.
       * @param mapfn A mapping function to call on every element of the array.
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
-    from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Int16Array;
+    from(arrayLike: ArrayLike<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Int16Array;
+
+    #if TARGET_HAS_ITERABLES
+    /**
+      * Creates an array from an iterable object.
+      * @param iterable An iterable object to convert to an array.
+      * @param mapfn A mapping function to call on every element of the array.
+      * @param thisArg Value of 'this' used to invoke the mapfn.
+      */
+    from(iterable: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Int16Array;
+    #endif
 }
 
 /**
@@ -4845,6 +5004,7 @@ interface Int16ArrayConstructor {
   * requested number of bytes could not be allocated an exception is raised.
   */
 interface Uint16Array {
+    #if TARGET_HAS_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -4857,19 +5017,37 @@ interface Uint16Array {
       * Returns an list of values in the array
       */
     values(): IterableIterator<number>;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
+    #endif
 }
 
 interface Uint16ArrayConstructor {
+    new (elements: ArrayLike<number>): Uint16Array;
+
+    #if TARGET_HAS_ITERABLES
     new (elements: Iterable<number>): Uint16Array;
+    #endif
 
     /**
-      * Creates an array from an array-like or iterable object.
-      * @param arrayLike An array-like or iterable object to convert to an array.
+      * Creates an array from an array-like object.
+      * @param arrayLike An array-like object to convert to an array.
       * @param mapfn A mapping function to call on every element of the array.
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
-    from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Uint16Array;
+    from(arrayLike: ArrayLike<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Uint16Array;
+
+    #if TARGET_HAS_ITERABLES
+    /**
+      * Creates an array from an iterable object.
+      * @param iterable An iterable object to convert to an array.
+      * @param mapfn A mapping function to call on every element of the array.
+      * @param thisArg Value of 'this' used to invoke the mapfn.
+      */
+    from(iterable: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Uint16Array;
+    #endif
 }
 
 /**
@@ -4877,6 +5055,7 @@ interface Uint16ArrayConstructor {
   * requested number of bytes could not be allocated an exception is raised.
   */
 interface Int32Array {
+    #if TARGET_HAS_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -4889,19 +5068,37 @@ interface Int32Array {
       * Returns an list of values in the array
       */
     values(): IterableIterator<number>;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
+    #endif
 }
 
 interface Int32ArrayConstructor {
+    new (elements: ArrayLike<number>): Int32Array;
+
+    #if TARGET_HAS_ITERABLES
     new (elements: Iterable<number>): Int32Array;
+    #endif
 
     /**
-      * Creates an array from an array-like or iterable object.
-      * @param arrayLike An array-like or iterable object to convert to an array.
+      * Creates an array from an array-like object.
+      * @param arrayLike An array-like object to convert to an array.
       * @param mapfn A mapping function to call on every element of the array.
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
-    from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Int32Array;
+    from(arrayLike: ArrayLike<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Int32Array;
+
+    #if TARGET_HAS_ITERABLES
+    /**
+      * Creates an array from an iterable object.
+      * @param iterable An iterable object to convert to an array.
+      * @param mapfn A mapping function to call on every element of the array.
+      * @param thisArg Value of 'this' used to invoke the mapfn.
+      */
+    from(iterable: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Int32Array;
+    #endif
 }
 
 /**
@@ -4909,6 +5106,7 @@ interface Int32ArrayConstructor {
   * requested number of bytes could not be allocated an exception is raised.
   */
 interface Uint32Array {
+    #if TARGET_HAS_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -4921,19 +5119,37 @@ interface Uint32Array {
       * Returns an list of values in the array
       */
     values(): IterableIterator<number>;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
+    #endif
 }
 
 interface Uint32ArrayConstructor {
+    new (elements: ArrayLike<number>): Uint32Array;
+
+    #if TARGET_HAS_ITERABLES
     new (elements: Iterable<number>): Uint32Array;
+    #endif
 
     /**
-      * Creates an array from an array-like or iterable object.
-      * @param arrayLike An array-like or iterable object to convert to an array.
+      * Creates an array from an array-like object.
+      * @param arrayLike An array-like object to convert to an array.
       * @param mapfn A mapping function to call on every element of the array.
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
-    from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Uint32Array;
+    from(arrayLike: ArrayLike<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Uint32Array;
+
+    #if TARGET_HAS_ITERABLES
+    /**
+      * Creates an array from an iterable object.
+      * @param iterable An iterable object to convert to an array.
+      * @param mapfn A mapping function to call on every element of the array.
+      * @param thisArg Value of 'this' used to invoke the mapfn.
+      */
+    from(iterable: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Uint32Array;
+    #endif
 }
 
 /**
@@ -4941,6 +5157,7 @@ interface Uint32ArrayConstructor {
   * of bytes could not be allocated an exception is raised.
   */
 interface Float32Array {
+    #if TARGET_HAS_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -4953,19 +5170,37 @@ interface Float32Array {
       * Returns an list of values in the array
       */
     values(): IterableIterator<number>;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
+    #endif
 }
 
 interface Float32ArrayConstructor {
+    new (elements: ArrayLike<number>): Float32Array;
+
+    #if TARGET_HAS_ITERABLES
     new (elements: Iterable<number>): Float32Array;
+    #endif
 
     /**
-      * Creates an array from an array-like or iterable object.
-      * @param arrayLike An array-like or iterable object to convert to an array.
+      * Creates an array from an array-like object.
+      * @param arrayLike An array-like object to convert to an array.
       * @param mapfn A mapping function to call on every element of the array.
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
-    from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Float32Array;
+    from(arrayLike: ArrayLike<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Float32Array;
+
+    #if TARGET_HAS_ITERABLES
+    /**
+      * Creates an array from an iterable object.
+      * @param iterable An iterable object to convert to an array.
+      * @param mapfn A mapping function to call on every element of the array.
+      * @param thisArg Value of 'this' used to invoke the mapfn.
+      */
+    from(iterable: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Float32Array;
+    #endif
 }
 
 /**
@@ -4973,6 +5208,7 @@ interface Float32ArrayConstructor {
   * number of bytes could not be allocated an exception is raised.
   */
 interface Float64Array {
+    #if TARGET_HAS_ITERABLES
     /** 
       * Returns an array of key, value pairs for every entry in the array
       */
@@ -4985,19 +5221,37 @@ interface Float64Array {
       * Returns an list of values in the array
       */
     values(): IterableIterator<number>;
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.iterator](): IterableIterator<number>;
+    #endif
+    #endif
 }
 
 interface Float64ArrayConstructor {
+    new (elements: ArrayLike<number>): Float64Array;
+
+    #if TARGET_HAS_ITERABLES
     new (elements: Iterable<number>): Float64Array;
+    #endif
 
     /**
-      * Creates an array from an array-like or iterable object.
-      * @param arrayLike An array-like or iterable object to convert to an array.
+      * Creates an array from an array-like object.
+      * @param arrayLike An array-like object to convert to an array.
       * @param mapfn A mapping function to call on every element of the array.
       * @param thisArg Value of 'this' used to invoke the mapfn.
       */
-    from(arrayLike: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Float64Array;
+    from(arrayLike: ArrayLike<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Float64Array;
+
+    #if TARGET_HAS_ITERABLES
+    /**
+      * Creates an array from an iterable object.
+      * @param iterable An iterable object to convert to an array.
+      * @param mapfn A mapping function to call on every element of the array.
+      * @param thisArg Value of 'this' used to invoke the mapfn.
+      */
+    from(iterable: Iterable<number>, mapfn?: (v: number, k: number) => number, thisArg?: any): Float64Array;
+    #endif
 }
 
 interface ProxyHandler<T> {
@@ -5028,7 +5282,11 @@ declare namespace Reflect {
     function construct(target: Function, argumentsList: ArrayLike<any>, newTarget?: any): any;
     function defineProperty(target: any, propertyKey: PropertyKey, attributes: PropertyDescriptor): boolean;
     function deleteProperty(target: any, propertyKey: PropertyKey): boolean;
+
+    #if TARGET_HAS_ITERABLES
     function enumerate(target: any): IterableIterator<any>;
+    #endif
+
     function get(target: any, propertyKey: PropertyKey, receiver?: any): any;
     function getOwnPropertyDescriptor(target: any, propertyKey: PropertyKey): PropertyDescriptor;
     function getPrototypeOf(target: any): any;
@@ -5041,6 +5299,7 @@ declare namespace Reflect {
     function setPrototypeOf(target: any, proto: any): boolean;
 }
 
+#if TARGET_HAS_PROMISES
 /**
  * Represents the completion of an asynchronous operation
  */
@@ -5062,7 +5321,10 @@ interface Promise<T> {
     catch(onrejected?: (reason: any) => T | PromiseLike<T>): Promise<T>;
     catch(onrejected?: (reason: any) => void): Promise<T>;
 
+
+    #if TARGET_HAS_SYMBOLS
     [Symbol.toStringTag]: string;
+    #endif
 }
 
 interface PromiseConstructor {
@@ -5082,18 +5344,38 @@ interface PromiseConstructor {
     /**
      * Creates a Promise that is resolved with an array of results when all of the provided Promises 
      * resolve, or rejected when any Promise is rejected.
-     * @param values An array of Promises.
+     * @param values An array-like object containing Promises.
+     * @returns A new Promise.
+     */
+    all<T>(values: ArrayLike<T | PromiseLike<T>>): Promise<T[]>;
+
+    #if TARGET_HAS_ITERABLES
+    /**
+     * Creates a Promise that is resolved with an array of results when all of the provided Promises 
+     * resolve, or rejected when any Promise is rejected.
+     * @param values An iterable object containing Promises.
      * @returns A new Promise.
      */
     all<T>(values: Iterable<T | PromiseLike<T>>): Promise<T[]>;
+    #endif
 
     /**
      * Creates a Promise that is resolved or rejected when any of the provided Promises are resolved 
      * or rejected.
-     * @param values An array of Promises.
+     * @param values An array-like object containing Promises.
+     * @returns A new Promise.
+     */
+    race<T>(values: ArrayLike<T | PromiseLike<T>>): Promise<T>;
+
+    #if TARGET_HAS_ITERABLES
+    /**
+     * Creates a Promise that is resolved or rejected when any of the provided Promises are resolved 
+     * or rejected.
+     * @param values An iterable Object containing of Promises.
      * @returns A new Promise.
      */
     race<T>(values: Iterable<T | PromiseLike<T>>): Promise<T>;
+    #endif
 
     /**
      * Creates a new rejected promise for the provided reason.
@@ -5122,10 +5404,13 @@ interface PromiseConstructor {
      */
     resolve(): Promise<void>;
 
+    #if TARGET_HAS_SYMBOLS
     [Symbol.species]: Function;
+    #endif
 }
 
 declare var Promise: PromiseConstructor;
+#endif // TARGET_HAS_PROMISES
 /////////////////////////////
 /// ECMAScript Internationalization API 
 /////////////////////////////
@@ -5216,6 +5501,7 @@ declare module Intl {
         timeZoneName?: string;
         formatMatcher?: string;
         hour12?: boolean;
+        timeZone?: string;
     }
 
     interface ResolvedDateTimeFormatOptions {
@@ -5285,18 +5571,45 @@ interface Number {
 
 interface Date {
     /**
-      * Converts a date to a string by using the current or specified locale.  
+      * Converts a date and time to a string by using the current or specified locale.  
       * @param locales An array of locale strings that contain one or more language or locale tags. If you include more than one locale string, list them in descending order of priority so that the first entry is the preferred locale. If you omit this parameter, the default locale of the JavaScript runtime is used.
       * @param options An object that contains one or more properties that specify comparison options.
       */
     toLocaleString(locales?: string[], options?: Intl.DateTimeFormatOptions): string;
+    /**
+      * Converts a date to a string by using the current or specified locale.  
+      * @param locales An array of locale strings that contain one or more language or locale tags. If you include more than one locale string, list them in descending order of priority so that the first entry is the preferred locale. If you omit this parameter, the default locale of the JavaScript runtime is used.
+      * @param options An object that contains one or more properties that specify comparison options.
+      */
+    toLocaleDateString(locales?: string[], options?: Intl.DateTimeFormatOptions): string;
 
+    /**
+      * Converts a time to a string by using the current or specified locale.  
+      * @param locale Locale tag. If you omit this parameter, the default locale of the JavaScript runtime is used.
+      * @param options An object that contains one or more properties that specify comparison options.
+      */
+    toLocaleTimeString(locale?: string[], options?: Intl.DateTimeFormatOptions): string;
+    
+    /**
+      * Converts a date and time to a string by using the current or specified locale.  
+      * @param locale Locale tag. If you omit this parameter, the default locale of the JavaScript runtime is used.
+      * @param options An object that contains one or more properties that specify comparison options.
+      */
+    toLocaleString(locale?: string, options?: Intl.DateTimeFormatOptions): string;
+    
     /**
       * Converts a date to a string by using the current or specified locale.  
       * @param locale Locale tag. If you omit this parameter, the default locale of the JavaScript runtime is used.
       * @param options An object that contains one or more properties that specify comparison options.
       */
-    toLocaleString(locale?: string, options?: Intl.DateTimeFormatOptions): string;
+    toLocaleDateString(locale?: string, options?: Intl.DateTimeFormatOptions): string;
+
+    /**
+      * Converts a time to a string by using the current or specified locale.  
+      * @param locale Locale tag. If you omit this parameter, the default locale of the JavaScript runtime is used.
+      * @param options An object that contains one or more properties that specify comparison options.
+      */
+    toLocaleTimeString(locale?: string, options?: Intl.DateTimeFormatOptions): string;
 }
 
 
@@ -18277,15 +18590,30 @@ declare function addEventListener(type: "volumechange", listener: (ev: Event) =>
 declare function addEventListener(type: "waiting", listener: (ev: Event) => any, useCapture?: boolean): void;
 declare function addEventListener(type: "wheel", listener: (ev: WheelEvent) => any, useCapture?: boolean): void;
 declare function addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): void;interface DOMTokenList {
+
+    #if TARGET_HAS_SYMBOLS
+    #if TARGET_HAS_ITERABLES
     [Symbol.iterator](): IterableIterator<string>;
+    #endif
+    #endif
 }
 
 interface NodeList {
+
+    #if TARGET_HAS_SYMBOLS
+    #if TARGET_HAS_ITERABLES
     [Symbol.iterator](): IterableIterator<Node>
+    #endif
+    #endif
 }
 
 interface NodeListOf<TNode extends Node> {
+
+    #if TARGET_HAS_SYMBOLS
+    #if TARGET_HAS_ITERABLES
     [Symbol.iterator](): IterableIterator<TNode>
+    #endif
+    #endif
 }
 
 /////////////////////////////
