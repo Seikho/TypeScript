@@ -575,6 +575,7 @@ namespace ts {
         Specify_whether_the_target_supports_ES6_iterables: { code: 6075, category: DiagnosticCategory.Message, key: "Specify whether the target supports ES6 iterables" },
         Specify_whether_the_target_supports_ES6_for_of_syntax: { code: 6076, category: DiagnosticCategory.Message, key: "Specify whether the target supports ES6 'for..of' syntax" },
         Specify_whether_the_target_supports_ES6_generators: { code: 6077, category: DiagnosticCategory.Message, key: "Specify whether the target supports ES6 generators" },
+        Specify_whether_the_target_supports_ES6_promises: { code: 6078, category: DiagnosticCategory.Message, key: "Specify whether the target supports ES6 promises" },
         Variable_0_implicitly_has_an_1_type: { code: 7005, category: DiagnosticCategory.Error, key: "Variable '{0}' implicitly has an '{1}' type." },
         Parameter_0_implicitly_has_an_1_type: { code: 7006, category: DiagnosticCategory.Error, key: "Parameter '{0}' implicitly has an '{1}' type." },
         Member_0_implicitly_has_an_1_type: { code: 7008, category: DiagnosticCategory.Error, key: "Member '{0}' implicitly has an '{1}' type." },

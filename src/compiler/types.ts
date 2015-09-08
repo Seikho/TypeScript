@@ -2058,6 +2058,7 @@ namespace ts {
         targetHasIterables?: boolean;
         targetHasForOf?: boolean;
         targetHasGenerators?: boolean;
+        targetHasPromises?: boolean;
         version?: boolean;
         watch?: boolean;
         isolatedModules?: boolean;
@@ -2113,6 +2114,7 @@ namespace ts {
         hasIterables: boolean;
         hasForOf: boolean;
         hasGenerators: boolean;
+        hasPromises: boolean;
     }
 
     export const enum LanguageVariant {

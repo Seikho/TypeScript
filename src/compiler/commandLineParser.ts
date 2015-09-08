@@ -225,6 +225,11 @@ namespace ts {
             description: Diagnostics.Specify_whether_the_target_supports_ES6_generators,
         },
         {
+            name: "targetHasPromises",
+            type: "boolean",
+            description: Diagnostics.Specify_whether_the_target_supports_ES6_promises,
+        },
+        {
             name: "version",
             shortName: "v",
             type: "boolean",

@@ -1392,6 +1392,7 @@ declare namespace Reflect {
     function setPrototypeOf(target: any, proto: any): boolean;
 }
 
+#if TARGET_HAS_PROMISES
 /**
  * Represents the completion of an asynchronous operation
  */
@@ -1497,3 +1498,4 @@ interface PromiseConstructor {
 }
 
 declare var Promise: PromiseConstructor;
+#endif // TARGET_HAS_PROMISES
