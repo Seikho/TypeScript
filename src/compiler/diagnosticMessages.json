@@ -2294,6 +2294,14 @@
         "category": "Message",
         "code": 6078
     },
+    "Specify whether the target supports ES6 block-scoped variables":  {
+        "category": "Message",
+        "code": 6078
+    },
+    "Specify whether the target supports ES6 arrow functions":  {
+        "category": "Message",
+        "code": 6078
+    },
 
     "Variable '{0}' implicitly has an '{1}' type.": {
         "category": "Error",

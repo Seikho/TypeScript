@@ -230,6 +230,16 @@ namespace ts {
             description: Diagnostics.Specify_whether_the_target_supports_ES6_promises,
         },
         {
+            name: "targetHasArrowFunctions",
+            type: "boolean",
+            description: Diagnostics.Specify_whether_the_target_supports_ES6_arrow_functions,
+        },
+        {
+            name: "targetHasBlockScoping",
+            type: "boolean",
+            description: Diagnostics.Specify_whether_the_target_supports_ES6_block_scoped_variables,
+        },
+        {
             name: "version",
             shortName: "v",
             type: "boolean",

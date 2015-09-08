@@ -2663,7 +2663,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
                 }
 
                 let tokenKind = SyntaxKind.VarKeyword;
-                if (decl && languageVersion.baseline >= ScriptTarget.ES6) {
+                if (decl && languageVersion.hasBlockScoping) {
                     if (isLet(decl)) {
                         tokenKind = SyntaxKind.LetKeyword;
                     }
@@ -3400,7 +3400,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
                 }
                 else {
                     let initializer = node.initializer;
-                    if (!initializer && languageVersion.baseline < ScriptTarget.ES6) {
+                    if (!initializer && !languageVersion.hasBlockScoping) {
 
                         // downlevel emit for non-initialized let bindings defined in loops
                         // for (...) {  let x; }
@@ -3642,7 +3642,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
             }
 
             function shouldEmitAsArrowFunction(node: FunctionLikeDeclaration): boolean {
-                return node.kind === SyntaxKind.ArrowFunction && languageVersion.baseline >= ScriptTarget.ES6;
+                return node.kind === SyntaxKind.ArrowFunction && languageVersion.hasArrowFunctions;
             }
 
             function emitDeclarationName(node: Declaration) {
@@ -3937,7 +3937,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
             }
 
             function emitExpressionFunctionBody(node: FunctionLikeDeclaration, body: Expression) {
-                if (languageVersion.baseline < ScriptTarget.ES6 || node.flags & NodeFlags.Async) {
+                if ((node.kind === SyntaxKind.ArrowFunction && !languageVersion.hasArrowFunctions)
+                    || (node.kind !== SyntaxKind.ArrowFunction && languageVersion.baseline < ScriptTarget.ES6)
+                    || node.flags & NodeFlags.Async) {
+
                     emitDownLevelExpressionFunctionBody(node, body);
                     return;
                 }

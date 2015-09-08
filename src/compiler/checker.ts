@@ -6313,7 +6313,7 @@ namespace ts {
             if (symbol === argumentsSymbol) {
                 let container = getContainingFunction(node);
                 if (container.kind === SyntaxKind.ArrowFunction) {
-                    if (languageVersion.baseline < ScriptTarget.ES6) {
+                    if (!languageVersion.hasArrowFunctions) {
                         error(node, Diagnostics.The_arguments_object_cannot_be_referenced_in_an_arrow_function_in_ES3_and_ES5_Consider_using_a_standard_function_expression);
                     }
                 }
@@ -6348,7 +6348,7 @@ namespace ts {
         }
 
         function checkBlockScopedBindingCapturedInLoop(node: Identifier, symbol: Symbol): void {
-            if (languageVersion.baseline >= ScriptTarget.ES6 ||
+            if (languageVersion.hasBlockScoping ||
                 (symbol.flags & SymbolFlags.BlockScopedVariable) === 0 ||
                 symbol.valueDeclaration.parent.kind === SyntaxKind.CatchClause) {
                 return;
@@ -6409,7 +6409,7 @@ namespace ts {
                 container = getThisContainer(container, /* includeArrowFunctions */ false);
 
                 // When targeting es6, arrow function lexically bind "this" so we do not need to do the work of binding "this" in emitted code
-                needToCaptureLexicalThis = (languageVersion.baseline < ScriptTarget.ES6);
+                needToCaptureLexicalThis = !languageVersion.hasArrowFunctions;
             }
 
             switch (container.kind) {
@@ -12193,7 +12193,6 @@ namespace ts {
 
             let reportedError = false;
             if (hasStringConstituent) {
-                // TODO: review this condition in light of granular targets
                 if (languageVersion.baseline < ScriptTarget.ES5) {
                     error(errorNode, Diagnostics.Using_a_string_in_a_for_of_statement_is_only_supported_in_ECMAScript_5_and_higher);
                     reportedError = true;
@@ -13712,6 +13711,7 @@ namespace ts {
                     links.flags |= NodeCheckFlags.EmitAwaiter;
                 }
 
+                // TODO (yortus): review this languageVersion condition in light of granular targeting
                 if (emitGenerator || (emitAwaiter && languageVersion.baseline < ScriptTarget.ES6)) {
                     links.flags |= NodeCheckFlags.EmitGenerator;
                 }
@@ -15453,7 +15453,7 @@ namespace ts {
                 }
             }
 
-            let checkLetConstNames = languageVersion.baseline >= ScriptTarget.ES6 && (isLet(node) || isConst(node));
+            let checkLetConstNames = languageVersion.hasBlockScoping && (isLet(node) || isConst(node));
 
             // 1. LexicalDeclaration : LetOrConst BindingList ;
             // It is a Syntax Error if the BoundNames of BindingList contains "let".

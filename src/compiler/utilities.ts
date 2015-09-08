@@ -2392,7 +2392,9 @@ namespace ts {
             hasIterables: compilerOptions.targetHasIterables !== void 0 ? compilerOptions.targetHasIterables : baseline >= ScriptTarget.ES6,
             hasForOf: compilerOptions.targetHasForOf !== void 0 ? compilerOptions.targetHasForOf : baseline >= ScriptTarget.ES6,
             hasGenerators: compilerOptions.targetHasGenerators !== void 0 ? compilerOptions.targetHasGenerators : baseline >= ScriptTarget.ES6,
-            hasPromises: compilerOptions.targetHasPromises !== void 0 ? compilerOptions.targetHasPromises : baseline >= ScriptTarget.ES6
+            hasPromises: compilerOptions.targetHasPromises !== void 0 ? compilerOptions.targetHasPromises : baseline >= ScriptTarget.ES6,
+            hasArrowFunctions: compilerOptions.targetHasArrowFunctions !== void 0 ? compilerOptions.targetHasArrowFunctions : baseline >= ScriptTarget.ES6,
+            hasBlockScoping: compilerOptions.targetHasBlockScoping !== void 0 ? compilerOptions.targetHasBlockScoping : baseline >= ScriptTarget.ES6
         };
     }
 
