@@ -2395,7 +2395,8 @@ namespace ts {
             hasPromises: compilerOptions.targetHasPromises !== void 0 ? compilerOptions.targetHasPromises : baseline >= ScriptTarget.ES6,
             hasArrowFunctions: compilerOptions.targetHasArrowFunctions !== void 0 ? compilerOptions.targetHasArrowFunctions : baseline >= ScriptTarget.ES6,
             hasBlockScoping: compilerOptions.targetHasBlockScoping !== void 0 ? compilerOptions.targetHasBlockScoping : baseline >= ScriptTarget.ES6,
-            hasSymbols: compilerOptions.targetHasSymbols !== void 0 ? compilerOptions.targetHasSymbols : baseline >= ScriptTarget.ES6
+            hasSymbols: compilerOptions.targetHasSymbols !== void 0 ? compilerOptions.targetHasSymbols : baseline >= ScriptTarget.ES6,
+            hasModules: compilerOptions.targetHasModules !== void 0 ? compilerOptions.targetHasModules : baseline >= ScriptTarget.ES6
         };
     }
 

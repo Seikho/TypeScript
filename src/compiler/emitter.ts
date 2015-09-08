@@ -1489,7 +1489,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
                 if (container) {
                     if (container.kind === SyntaxKind.SourceFile) {
                         // Identifier references module export
-                        if (languageVersion.baseline < ScriptTarget.ES6 && compilerOptions.module !== ModuleKind.System) {
+                        if (!languageVersion.hasModules && compilerOptions.module !== ModuleKind.System) {
                             write("exports.");
                         }
                     }
@@ -1499,7 +1499,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
                         write(".");
                     }
                 }
-                else if (languageVersion.baseline < ScriptTarget.ES6) {
+                else if (!languageVersion.hasModules) {
                     let declaration = resolver.getReferencedImportDeclaration(node);
                     if (declaration) {
                         if (declaration.kind === SyntaxKind.ImportClause) {
@@ -1532,7 +1532,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
             }
 
             function isNameOfNestedRedeclaration(node: Identifier) {
-                if (languageVersion.baseline < ScriptTarget.ES6) {
+                if (!languageVersion.hasModules) {
                     let parent = node.parent;
                     switch (parent.kind) {
                         case SyntaxKind.BindingElement:
@@ -2482,7 +2482,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
              *   we we emit variable statement 'var' should be dropped.
              */
             function isSourceFileLevelDeclarationInSystemJsModule(node: Node, isExported: boolean): boolean {
-                if (!node || languageVersion.baseline >= ScriptTarget.ES6 || !isCurrentFileSystemExternalModule()) {
+                if (!node || languageVersion.hasModules || !isCurrentFileSystemExternalModule()) {
                     return false;
                 }
 
@@ -3044,7 +3044,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
                         write(getGeneratedNameForNode(container));
                         write(".");
                     }
-                    else if (languageVersion.baseline < ScriptTarget.ES6 && compilerOptions.module !== ModuleKind.System) {
+                    else if (!languageVersion.hasModules && compilerOptions.module !== ModuleKind.System) {
                         write("exports.");
                     }
                 }
@@ -3066,7 +3066,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
                     // only allow export default at a source file level
                     if (compilerOptions.module === ModuleKind.CommonJS || compilerOptions.module === ModuleKind.AMD || compilerOptions.module === ModuleKind.UMD) {
                         if (!currentSourceFile.symbol.exports["___esModule"]) {
-                            if (languageVersion.baseline === ScriptTarget.ES5) {
+                            if (languageVersion.baseline >= ScriptTarget.ES5) {
                                 // default value of configurable, enumerable, writable are `false`.
                                 write("Object.defineProperty(exports, \"__esModule\", { value: true });");
                                 writeLine();
@@ -3460,7 +3460,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
 
             function isES6ExportedDeclaration(node: Node) {
                 return !!(node.flags & NodeFlags.Export) &&
-                    languageVersion.baseline >= ScriptTarget.ES6 &&
+                    languageVersion.hasModules &&
                     node.parent.kind === SyntaxKind.SourceFile;
             }
 
@@ -3488,7 +3488,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
                         write(";");
                     }
                 }
-                if (languageVersion.baseline < ScriptTarget.ES6 && node.parent === currentSourceFile) {
+                if (!languageVersion.hasModules && node.parent === currentSourceFile) {
                     forEach(node.declarationList.declarations, emitExportVariableAssignments);
                 }
             }
@@ -3714,7 +3714,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
                 }
 
                 emitSignatureAndBody(node);
-                if (languageVersion.baseline < ScriptTarget.ES6 && node.kind === SyntaxKind.FunctionDeclaration && node.parent === currentSourceFile && node.name) {
+                if (!languageVersion.hasModules && node.kind === SyntaxKind.FunctionDeclaration && node.parent === currentSourceFile && node.name) {
                     emitExportMemberAssignments((<FunctionDeclaration>node).name);
                 }
 
@@ -4642,7 +4642,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
                     emitExportMemberAssignment(<ClassDeclaration>node);
                 }
 
-                if (languageVersion.baseline < ScriptTarget.ES6 && node.parent === currentSourceFile && node.name) {
+                if (!languageVersion.hasModules && node.parent === currentSourceFile && node.name) {
                     emitExportMemberAssignments(node.name);
                 }
             }
@@ -5228,7 +5228,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
                     emitEnd(node);
                     write(";");
                 }
-                if (languageVersion.baseline < ScriptTarget.ES6 && node.parent === currentSourceFile) {
+                if (!languageVersion.hasModules && node.parent === currentSourceFile) {
                     if (compilerOptions.module === ModuleKind.System && (node.flags & NodeFlags.Export)) {
                         // write the call to exporter for enum
                         writeLine();
@@ -5284,6 +5284,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
             }
 
             function isModuleMergedWithES6Class(node: ModuleDeclaration) {
+                // TODO (yortus): review this languageVersion condition in light of granular targeting
                 return languageVersion.baseline === ScriptTarget.ES6 && !!(resolver.getNodeCheckFlags(node) & NodeCheckFlags.LexicalModuleMergesWithClass);
             }
 
@@ -5415,7 +5416,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
             }
 
             function emitImportDeclaration(node: ImportDeclaration) {
-                if (languageVersion.baseline < ScriptTarget.ES6) {
+                if (!languageVersion.hasModules) {
                     return emitExternalImportDeclaration(node);
                 }
 
@@ -5580,7 +5581,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
             function emitExportDeclaration(node: ExportDeclaration) {
                 Debug.assert(compilerOptions.module !== ModuleKind.System);
 
-                if (languageVersion.baseline < ScriptTarget.ES6) {
+                if (!languageVersion.hasModules) {
                     if (node.moduleSpecifier && (!node.exportClause || resolver.isValueAliasDeclaration(node))) {
                         emitStart(node);
                         let generatedName = getGeneratedNameForNode(node);
@@ -5646,7 +5647,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
             }
 
             function emitExportOrImportSpecifierList(specifiers: ImportOrExportSpecifier[], shouldEmit: (node: Node) => boolean) {
-                Debug.assert(languageVersion.baseline >= ScriptTarget.ES6);
+                Debug.assert(languageVersion.hasModules);
 
                 let needsComma = false;
                 for (let specifier of specifiers) {
@@ -5666,7 +5667,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
 
             function emitExportAssignment(node: ExportAssignment) {
                 if (!node.isExportEquals && resolver.isValueAliasDeclaration(node)) {
-                    if (languageVersion.baseline >= ScriptTarget.ES6) {
+                    if (languageVersion.hasModules) {
                         writeLine();
                         emitStart(node);
                         write("export default ");
@@ -6685,7 +6686,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
                 let startIndex = emitDirectivePrologues(node.statements, /*startWithNewLine*/ false);
 
                 if (isExternalModule(node) || compilerOptions.isolatedModules) {
-                    if (languageVersion.baseline >= ScriptTarget.ES6) {
+                    if (languageVersion.hasModules) {
                         emitES6Module(node, startIndex);
                     }
                     else if (compilerOptions.module === ModuleKind.AMD) {
@@ -6791,7 +6792,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
                     node.parent &&
                     node.parent.kind === SyntaxKind.ArrowFunction &&
                     (<ArrowFunction>node.parent).body === node &&
-                    compilerOptions.target <= ScriptTarget.ES5) {
+                    !languageVersion.hasArrowFunctions) {
 
                     return false;
                 }

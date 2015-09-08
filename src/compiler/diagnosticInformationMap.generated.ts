@@ -579,6 +579,7 @@ namespace ts {
         Specify_whether_the_target_supports_ES6_block_scoped_variables: { code: 6079, category: DiagnosticCategory.Message, key: "Specify whether the target supports ES6 block-scoped variables" },
         Specify_whether_the_target_supports_ES6_arrow_functions: { code: 6080, category: DiagnosticCategory.Message, key: "Specify whether the target supports ES6 arrow functions" },
         Specify_whether_the_target_supports_ES6_symbols: { code: 6081, category: DiagnosticCategory.Message, key: "Specify whether the target supports ES6 symbols" },
+        Specify_whether_the_target_supports_ES6_modules: { code: 6082, category: DiagnosticCategory.Message, key: "Specify whether the target supports ES6 modules" },
         Variable_0_implicitly_has_an_1_type: { code: 7005, category: DiagnosticCategory.Error, key: "Variable '{0}' implicitly has an '{1}' type." },
         Parameter_0_implicitly_has_an_1_type: { code: 7006, category: DiagnosticCategory.Error, key: "Parameter '{0}' implicitly has an '{1}' type." },
         Member_0_implicitly_has_an_1_type: { code: 7008, category: DiagnosticCategory.Error, key: "Member '{0}' implicitly has an '{1}' type." },

@@ -995,11 +995,12 @@ namespace ts {
             }
 
             let languageVersion = options.target || ScriptTarget.ES3;
+            let targetHasModules = options.targetHasModules !== void 0 ? options.targetHasModules : options.target >= ScriptTarget.ES6;
             let outFile = options.outFile || options.out;
 
             let firstExternalModuleSourceFile = forEach(files, f => isExternalModule(f) ? f : undefined);
             if (options.isolatedModules) {
-                if (!options.module && languageVersion < ScriptTarget.ES6) {
+                if (!options.module && !targetHasModules) {
                     diagnostics.add(createCompilerDiagnostic(Diagnostics.Option_isolatedModules_can_only_be_used_when_either_option_module_is_provided_or_option_target_is_ES6_or_higher));
                 }
 
@@ -1009,14 +1010,14 @@ namespace ts {
                     diagnostics.add(createFileDiagnostic(firstNonExternalModuleSourceFile, span.start, span.length, Diagnostics.Cannot_compile_namespaces_when_the_isolatedModules_flag_is_provided));
                 }
             }
-            else if (firstExternalModuleSourceFile && languageVersion < ScriptTarget.ES6 && !options.module) {
+            else if (firstExternalModuleSourceFile && !targetHasModules && !options.module) {
                 // We cannot use createDiagnosticFromNode because nodes do not have parents yet
                 let span = getErrorSpanForNode(firstExternalModuleSourceFile, firstExternalModuleSourceFile.externalModuleIndicator);
                 diagnostics.add(createFileDiagnostic(firstExternalModuleSourceFile, span.start, span.length, Diagnostics.Cannot_compile_modules_unless_the_module_flag_is_provided));
             }
 
             // Cannot specify module gen target when in es6 or above
-            if (options.module && languageVersion >= ScriptTarget.ES6) {
+            if (options.module && targetHasModules) {
                 diagnostics.add(createCompilerDiagnostic(Diagnostics.Cannot_compile_modules_into_commonjs_amd_system_or_umd_when_targeting_ES6_or_higher));
             }
 

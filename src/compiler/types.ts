@@ -2062,6 +2062,7 @@ namespace ts {
         targetHasArrowFunctions?: boolean;
         targetHasBlockScoping?: boolean;
         targetHasSymbols?: boolean;
+        targetHasModules?: boolean;
         version?: boolean;
         watch?: boolean;
         isolatedModules?: boolean;
@@ -2121,6 +2122,7 @@ namespace ts {
         hasArrowFunctions: boolean;
         hasBlockScoping: boolean;
         hasSymbols: boolean;
+        hasModules: boolean;
         [key: string]: ScriptTarget | boolean;
     }
 
