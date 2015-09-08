@@ -239,7 +239,7 @@ namespace ts {
                 hostGetSourceFile = compilerHost.getSourceFile;
                 compilerHost.getSourceFile = getSourceFile;
 
-                // Set preprocessor symbols
+                // Set preprocessor symbols based on compiler options
                 let preprocessorSymbols = getPreprocessorSymbolsFromCompilerOptions(compilerOptions);
                 setPreprocessorSymbols(preprocessorSymbols);
             }

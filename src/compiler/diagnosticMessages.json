@@ -965,7 +965,7 @@
         "category": "Error",
         "code": 2341
     },
-    "An index expression argument must be of type 'string', 'number', 'symbol, or 'any'.": {
+    "An index expression argument must be of type 'string', 'number', 'symbol', or 'any'.": {
         "category": "Error",
         "code": 2342
     },
@@ -2467,16 +2467,12 @@
         "category":  "Error",
         "code": 18000
     },
-    "Single line comment or end of line expected": {
+    "A preprocessor directive must be the only instruction on the line": {
         "category":  "Error",
         "code": 18001
     },
     "#if preprocessor directive has no matching #endif": {
         "category":  "Error",
         "code": 18002
-    },
-    "Unexpected preprocessor directive": {
-        "category":  "Error",
-        "code": 18003
     }
 }
