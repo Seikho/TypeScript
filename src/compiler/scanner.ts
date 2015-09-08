@@ -678,7 +678,7 @@ namespace ts {
     let preprocessorDirectives: Map<SyntaxKind> = {
         "#if": SyntaxKind.IfPreprocessorDirective,
         "#endif": SyntaxKind.EndIfPreprocessorDirective
-    }
+    };
 
     let preprocessorSymbols: string[] = [];
 
