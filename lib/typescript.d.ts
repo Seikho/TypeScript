@@ -13,7 +13,7 @@ See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
 
-declare module "typescript" {
+declare module "yortus-typescript" {
     interface Map<T> {
         [index: string]: T;
     }
@@ -1429,7 +1429,7 @@ declare module "typescript" {
         newLength: number;
     }
 }
-declare module "typescript" {
+declare module "yortus-typescript" {
     interface System {
         args: string[];
         newLine: string;
@@ -1453,7 +1453,7 @@ declare module "typescript" {
     }
     var sys: System;
 }
-declare module "typescript" {
+declare module "yortus-typescript" {
     interface ErrorCallback {
         (message: DiagnosticMessage, length: number): void;
     }
@@ -1500,7 +1500,7 @@ declare module "typescript" {
     function setPreprocessorSymbols(value: string[]): void;
     function createScanner(languageVersion: ScriptTarget, skipTrivia: boolean, languageVariant?: LanguageVariant, text?: string, onError?: ErrorCallback, start?: number, length?: number): Scanner;
 }
-declare module "typescript" {
+declare module "yortus-typescript" {
     function getDefaultLibFileName(options: CompilerOptions): string;
     function textSpanEnd(span: TextSpan): number;
     function textSpanIsEmpty(span: TextSpan): boolean;
@@ -1533,14 +1533,14 @@ declare module "typescript" {
     function getPreprocessorSymbolsFromCompilerOptions(compilerOptions: CompilerOptions): string[];
     function toUpperSnakeCase(identifier: string): string;
 }
-declare module "typescript" {
+declare module "yortus-typescript" {
     function getNodeConstructor(kind: SyntaxKind): new () => Node;
     function createNode(kind: SyntaxKind): Node;
     function forEachChild<T>(node: Node, cbNode: (node: Node) => T, cbNodeArray?: (nodes: Node[]) => T): T;
     function createSourceFile(fileName: string, sourceText: string, languageVersion: ScriptTarget, setParentNodes?: boolean): SourceFile;
     function updateSourceFile(sourceFile: SourceFile, newText: string, textChangeRange: TextChangeRange, aggressiveChecks?: boolean): SourceFile;
 }
-declare module "typescript" {
+declare module "yortus-typescript" {
     const version: string;
     function findConfigFile(searchPath: string): string;
     function resolveTripleslashReference(moduleName: string, containingFile: string): string;
@@ -1553,7 +1553,7 @@ declare module "typescript" {
     function flattenDiagnosticMessageText(messageText: string | DiagnosticMessageChain, newLine: string): string;
     function createProgram(rootNames: string[], options: CompilerOptions, host?: CompilerHost, oldProgram?: Program): Program;
 }
-declare module "typescript" {
+declare module "yortus-typescript" {
     function parseCommandLine(commandLine: string[], readFile?: (path: string) => string): ParsedCommandLine;
     /**
       * Read tsconfig.json file
@@ -1580,7 +1580,7 @@ declare module "typescript" {
       */
     function parseConfigFile(json: any, host: ParseConfigHost, basePath: string): ParsedCommandLine;
 }
-declare module "typescript" {
+declare module "yortus-typescript" {
     /** The version of the language service API */
     let servicesVersion: string;
     interface Node {
