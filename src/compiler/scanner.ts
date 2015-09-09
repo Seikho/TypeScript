@@ -416,7 +416,7 @@ namespace ts {
       }
 
       /* @internal */
-      export function skipTrivia(text: string, pos: number, stopAfterLineBreak?: boolean): number {
+      export function skipTrivia(text: string, pos: number): number {
           // Keep in sync with couldStartTrivia
           while (true) {
               let ch = text.charCodeAt(pos);
@@ -427,9 +427,6 @@ namespace ts {
                       }
                   case CharacterCodes.lineFeed:
                       pos++;
-                      if (stopAfterLineBreak) {
-                          return pos;
-                      }
                       continue;
                   case CharacterCodes.tab:
                   case CharacterCodes.verticalTab:
