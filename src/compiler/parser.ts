@@ -825,7 +825,7 @@ namespace ts {
         }
 
         function getTokenPos(pos: number): number {
-            return skipTrivia(sourceText, pos);
+            return skipTrivia(sourceText, pos, sourceFile.isDefaultLib);
         }
 
         function reScanGreaterToken(): SyntaxKind {
@@ -5522,7 +5522,7 @@ namespace ts {
             function checkForEmptyTypeArgumentList(typeArguments: NodeArray<Node>) {
                 if (parseDiagnostics.length === 0 &&  typeArguments && typeArguments.length === 0) {
                     let start = typeArguments.pos - "<".length;
-                    let end = skipTrivia(sourceText, typeArguments.end) + ">".length;
+                    let end = skipTrivia(sourceText, typeArguments.end, sourceFile.isDefaultLib) + ">".length;
                     return parseErrorAtPosition(start, end - start, Diagnostics.Type_argument_list_cannot_be_empty);
                 }
             }

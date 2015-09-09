@@ -451,7 +451,7 @@ namespace ts.SignatureHelp {
             // The applicable span is from the first bar to the second bar (inclusive,
             // but not including parentheses)
             let applicableSpanStart = argumentsList.getFullStart();
-            let applicableSpanEnd = skipTrivia(sourceFile.text, argumentsList.getEnd());
+            let applicableSpanEnd = skipTrivia(sourceFile.text, argumentsList.getEnd(), sourceFile.isDefaultLib);
             return createTextSpan(applicableSpanStart, applicableSpanEnd - applicableSpanStart);
         }
 
@@ -472,7 +472,7 @@ namespace ts.SignatureHelp {
             if (template.kind === SyntaxKind.TemplateExpression) {
                 let lastSpan = lastOrUndefined((<TemplateExpression>template).templateSpans);
                 if (lastSpan.literal.getFullWidth() === 0) {
-                    applicableSpanEnd = skipTrivia(sourceFile.text, applicableSpanEnd);
+                    applicableSpanEnd = skipTrivia(sourceFile.text, applicableSpanEnd, sourceFile.isDefaultLib);
                 }
             }
 

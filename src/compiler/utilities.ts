@@ -195,7 +195,8 @@ namespace ts {
             return node.pos;
         }
 
-        return skipTrivia((sourceFile || getSourceFileOfNode(node)).text, node.pos);
+        sourceFile = sourceFile || getSourceFileOfNode(node);
+        return skipTrivia(sourceFile.text, node.pos, sourceFile.isDefaultLib);
     }
 
     export function getNonDecoratorTokenPosOfNode(node: Node, sourceFile?: SourceFile): number {
@@ -203,7 +204,8 @@ namespace ts {
             return getTokenPosOfNode(node, sourceFile);
         }
 
-        return skipTrivia((sourceFile || getSourceFileOfNode(node)).text, node.decorators.end);
+        sourceFile = sourceFile || getSourceFileOfNode(node);
+        return skipTrivia(sourceFile.text, node.decorators.end, sourceFile.isDefaultLib);
     }
 
     export function getSourceTextOfNodeFromSourceFile(sourceFile: SourceFile, node: Node, includeTrivia = false): string {
@@ -212,7 +214,7 @@ namespace ts {
         }
 
         let text = sourceFile.text;
-        return text.substring(includeTrivia ? node.pos : skipTrivia(text, node.pos), node.end);
+        return text.substring(includeTrivia ? node.pos : skipTrivia(text, node.pos, sourceFile.isDefaultLib), node.end);
     }
 
     export function getTextOfNodeFromSourceText(sourceText: string, node: Node): string {
@@ -220,7 +222,7 @@ namespace ts {
             return "";
         }
 
-        return sourceText.substring(skipTrivia(sourceText, node.pos), node.end);
+        return sourceText.substring(skipTrivia(sourceText, node.pos, getSourceFileOfNode(node).isDefaultLib), node.end);
     }
 
     export function getTextOfNode(node: Node, includeTrivia = false): string {
@@ -321,7 +323,7 @@ namespace ts {
         let errorNode = node;
         switch (node.kind) {
             case SyntaxKind.SourceFile:
-                let pos = skipTrivia(sourceFile.text, 0);
+                let pos = skipTrivia(sourceFile.text, 0, sourceFile.isDefaultLib);
                 if (pos === sourceFile.text.length) {
                     // file is empty - return span for the beginning of the file
                     return createTextSpan(0, 0);
@@ -351,7 +353,7 @@ namespace ts {
 
         let pos = nodeIsMissing(errorNode)
             ? errorNode.pos
-            : skipTrivia(sourceFile.text, errorNode.pos);
+            : skipTrivia(sourceFile.text, errorNode.pos, sourceFile.isDefaultLib);
 
         return createTextSpanFromBounds(pos, errorNode.end);
     }

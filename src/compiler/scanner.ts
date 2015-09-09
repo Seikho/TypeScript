@@ -416,7 +416,7 @@ namespace ts {
       }
 
       /* @internal */
-      export function skipTrivia(text: string, pos: number): number {
+      export function skipTrivia(text: string, pos: number, isDefaultLib: boolean): number {
           // Keep in sync with couldStartTrivia
           while (true) {
               let ch = text.charCodeAt(pos);

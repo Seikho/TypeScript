@@ -37,7 +37,7 @@ class TypeWriterWalker {
     }
 
     private logTypeAndSymbol(node: ts.Node): void {
-        let actualPos = ts.skipTrivia(this.currentSourceFile.text, node.pos);
+        let actualPos = ts.skipTrivia(this.currentSourceFile.text, node.pos, this.currentSourceFile.isDefaultLib);
         let lineAndCharacter = this.currentSourceFile.getLineAndCharacterOfPosition(actualPos);
         let sourceText = ts.getTextOfNodeFromSourceText(this.currentSourceFile.text, node);
 

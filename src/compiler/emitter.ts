@@ -450,7 +450,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
 
                 function recordEmitNodeStartSpan(node: Node) {
                     // Get the token pos after skipping to the token (ignoring the leading trivia)
-                    recordSourceMapSpan(skipTrivia(currentSourceFile.text, node.pos));
+                    recordSourceMapSpan(skipTrivia(currentSourceFile.text, node.pos, currentSourceFile.isDefaultLib));
                 }
 
                 function recordEmitNodeEndSpan(node: Node) {
@@ -458,7 +458,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
                 }
 
                 function writeTextWithSpanRecord(tokenKind: SyntaxKind, startPos: number, emitFn?: () => void) {
-                    let tokenStartPos = ts.skipTrivia(currentSourceFile.text, startPos);
+                    let tokenStartPos = ts.skipTrivia(currentSourceFile.text, startPos, currentSourceFile.isDefaultLib);
                     recordSourceMapSpan(tokenStartPos);
                     let tokenEndPos = emitTokenText(tokenKind, tokenStartPos, emitFn);
                     recordSourceMapSpan(tokenEndPos);
@@ -2950,8 +2950,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
             }
 
             function nodeStartPositionsAreOnSameLine(node1: Node, node2: Node) {
-                return getLineOfLocalPosition(currentSourceFile, skipTrivia(currentSourceFile.text, node1.pos)) ===
-                    getLineOfLocalPosition(currentSourceFile, skipTrivia(currentSourceFile.text, node2.pos));
+                return getLineOfLocalPosition(currentSourceFile, skipTrivia(currentSourceFile.text, node1.pos, currentSourceFile.isDefaultLib)) ===
+                    getLineOfLocalPosition(currentSourceFile, skipTrivia(currentSourceFile.text, node2.pos, currentSourceFile.isDefaultLib));
             }
 
             function nodeEndPositionsAreOnSameLine(node1: Node, node2: Node) {
@@ -2961,7 +2961,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
 
             function nodeEndIsOnSameLineAsNodeStart(node1: Node, node2: Node) {
                 return getLineOfLocalPosition(currentSourceFile, node1.end) ===
-                    getLineOfLocalPosition(currentSourceFile, skipTrivia(currentSourceFile.text, node2.pos));
+                    getLineOfLocalPosition(currentSourceFile, skipTrivia(currentSourceFile.text, node2.pos, currentSourceFile.isDefaultLib));
             }
 
             function emitCaseOrDefaultClause(node: CaseOrDefaultClause) {
@@ -7118,7 +7118,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, Promi
                         // sure there is at least one blank line between it and the node.  If not, it's not
                         // a copyright header.
                         let lastCommentLine = getLineOfLocalPosition(currentSourceFile, lastOrUndefined(detachedComments).end);
-                        let nodeLine = getLineOfLocalPosition(currentSourceFile, skipTrivia(currentSourceFile.text, node.pos));
+                        let nodeLine = getLineOfLocalPosition(currentSourceFile, skipTrivia(currentSourceFile.text, node.pos, currentSourceFile.isDefaultLib));
                         if (nodeLine >= lastCommentLine + 2) {
                             // Valid detachedComments
                             emitNewLineBeforeLeadingComments(currentSourceFile, writer, node, leadingComments);

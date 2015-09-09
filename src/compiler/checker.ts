@@ -7796,7 +7796,7 @@ namespace ts {
             if (!node.argumentExpression) {
                 let sourceFile = getSourceFile(node);
                 if (node.parent.kind === SyntaxKind.NewExpression && (<NewExpression>node.parent).expression === node) {
-                    let start = skipTrivia(sourceFile.text, node.expression.end);
+                    let start = skipTrivia(sourceFile.text, node.expression.end, sourceFile.isDefaultLib);
                     let end = node.end;
                     grammarErrorAtPos(sourceFile, start, end - start, Diagnostics.new_T_cannot_be_used_to_create_an_array_Use_new_Array_T_instead);
                 }
@@ -12317,7 +12317,7 @@ namespace ts {
                     }
                     else {
                         let sourceFile = getSourceFileOfNode(node);
-                        let start = skipTrivia(sourceFile.text, clause.pos);
+                        let start = skipTrivia(sourceFile.text, clause.pos, sourceFile.isDefaultLib);
                         let end = clause.statements.length > 0 ? clause.statements[0].pos : clause.end;
                         grammarErrorAtPos(sourceFile, start, end - start, Diagnostics.A_default_clause_cannot_appear_more_than_once_in_a_switch_statement);
                         hasDuplicateDefaultClause = true;
@@ -14875,7 +14875,7 @@ namespace ts {
 
             if (typeParameters && typeParameters.length === 0) {
                 let start = typeParameters.pos - "<".length;
-                let end = skipTrivia(file.text, typeParameters.end) + ">".length;
+                let end = skipTrivia(file.text, typeParameters.end, file.isDefaultLib) + ">".length;
                 return grammarErrorAtPos(file, start, end - start, Diagnostics.Type_parameter_list_cannot_be_empty);
             }
         }
@@ -14987,7 +14987,7 @@ namespace ts {
             if (typeArguments && typeArguments.length === 0) {
                 let sourceFile = getSourceFileOfNode(node);
                 let start = typeArguments.pos - "<".length;
-                let end = skipTrivia(sourceFile.text, typeArguments.end) + ">".length;
+                let end = skipTrivia(sourceFile.text, typeArguments.end, sourceFile.isDefaultLib) + ">".length;
                 return grammarErrorAtPos(sourceFile, start, end - start, Diagnostics.Type_argument_list_cannot_be_empty);
             }
         }
