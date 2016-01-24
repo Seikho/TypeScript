@@ -164,7 +164,7 @@ namespace ts {
                 return isCompletedNode((<DoStatement>n).statement, sourceFile);
 
             case SyntaxKind.TypeQuery:
-                return isCompletedNode((<TypeQueryNode>n).exprName, sourceFile);
+                return isCompletedNode((<TypeQueryNode>n).operand, sourceFile);
 
             case SyntaxKind.TypeOfExpression:
             case SyntaxKind.DeleteExpression:

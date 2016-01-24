@@ -774,7 +774,7 @@ namespace ts {
 
     // @kind(SyntaxKind.TypeQuery)
     export interface TypeQueryNode extends TypeNode {
-        exprName: EntityName;
+        operand: UnaryExpression;
     }
 
     // A TypeLiteral is the declaration node for an anonymous symbol.

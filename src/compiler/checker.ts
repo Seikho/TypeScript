@@ -4509,7 +4509,8 @@ namespace ts {
                 // The expression is processed as an identifier expression (section 4.3)
                 // or property access expression(section 4.10),
                 // the widened type(section 3.9) of which becomes the result.
-                links.resolvedType = getWidenedType(checkExpression(node.exprName));
+                // TODO: update above comment - expression is an arbitrary unary expression
+                links.resolvedType = getWidenedType(checkExpression(node.operand));
             }
             return links.resolvedType;
         }
@@ -6705,19 +6706,11 @@ namespace ts {
             // TypeScript 1.0 spec (April 2014): 3.6.3
             // A type query consists of the keyword typeof followed by an expression.
             // The expression is restricted to a single identifier or a sequence of identifiers separated by periods
-            while (node) {
-                switch (node.kind) {
-                    case SyntaxKind.TypeQuery:
-                        return true;
-                    case SyntaxKind.Identifier:
-                    case SyntaxKind.QualifiedName:
-                        node = node.parent;
-                        continue;
-                    default:
-                        return false;
-                }
+            // TODO: update above comment - expression is an arbitrary unary expression
+            while (node && node.kind !== SyntaxKind.TypeQuery) {
+                node = node.parent;
             }
-            Debug.fail("should not get here");
+            return !!node;
         }
 
         function hasInitializer(node: VariableLikeDeclaration): boolean {
@@ -16972,6 +16965,10 @@ namespace ts {
             if (isInAmbientContext(node)) {
                 // An accessors is already reported about the ambient context
                 if (isAccessor(node.parent.kind)) {
+                    return getNodeLinks(node).hasReportedStatementInAmbientContext = true;
+                }
+
+                if (isInTypeQuery(node)) {
                     return getNodeLinks(node).hasReportedStatementInAmbientContext = true;
                 }
 

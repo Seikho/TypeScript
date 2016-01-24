@@ -116,7 +116,7 @@ namespace ts {
                 return visitNode(cbNode, (<TypePredicateNode>node).parameterName) ||
                     visitNode(cbNode, (<TypePredicateNode>node).type);
             case SyntaxKind.TypeQuery:
-                return visitNode(cbNode, (<TypeQueryNode>node).exprName);
+                return visitNode(cbNode, (<TypeQueryNode>node).operand);
             case SyntaxKind.TypeLiteral:
                 return visitNodes(cbNodes, (<TypeLiteralNode>node).members);
             case SyntaxKind.ArrayType:
@@ -1957,7 +1957,7 @@ namespace ts {
         function parseTypeQuery(): TypeQueryNode {
             const node = <TypeQueryNode>createNode(SyntaxKind.TypeQuery);
             parseExpected(SyntaxKind.TypeOfKeyword);
-            node.exprName = parseEntityName(/*allowReservedWords*/ true);
+            node.operand = parseSimpleUnaryExpression();
             return finishNode(node);
         }
 
