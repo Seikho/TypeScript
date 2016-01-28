@@ -1819,6 +1819,14 @@
         "category": "Error",
         "code": 2670
     },
+    "A generator cannot have a return type annotation of a class type.": {
+        "category": "Error",
+        "code": 2671
+    },
+    "An async function cannot have a return type annotation of a class type other than Promise<T>.": {
+        "category": "Error",
+        "code": 2672
+    },
     "Import declaration '{0}' is using private name '{1}'.": {
         "category": "Error",
         "code": 4000

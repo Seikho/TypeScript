@@ -11646,13 +11646,19 @@ namespace ts {
                             const generatorElementType = getElementTypeOfIterableIterator(returnType) || anyType;
                             const iterableIteratorInstantiation = createIterableIteratorType(generatorElementType);
 
-                            // Naively, one could check that IterableIterator<any> is assignable to the return type annotation.
-                            // However, that would not catch the error in the following case.
-                            //
-                            //    interface BadGenerator extends Iterable<number>, Iterator<string> { }
-                            //    function* g(): BadGenerator { } // Iterable and Iterator have different types!
-                            //
-                            checkTypeAssignableTo(iterableIteratorInstantiation, returnType, node.type);
+                            // Ensure the return type is a not class type, since we know it won't have that type at runtime.
+                            if (isClassInstanceType(node.type)) {
+                                error(node.type, Diagnostics.A_generator_cannot_have_a_return_type_annotation_of_a_class_type);
+                            }
+                            else {
+                                // Naively, one could check that IterableIterator<any> is assignable to the return type annotation.
+                                // However, that would not catch the error in the following case.
+                                //
+                                //    interface BadGenerator extends Iterable<number>, Iterator<string> { }
+                                //    function* g(): BadGenerator { } // Iterable and Iterator have different types!
+                                //
+                                checkTypeAssignableTo(iterableIteratorInstantiation, returnType, node.type);
+                            }
                         }
                     }
                     else if (isAsyncFunctionLike(node)) {
@@ -12528,6 +12534,18 @@ namespace ts {
         }
 
         /**
+         * A TypeNode represents the type of a class instance if its
+         * resolved symbol is a value whose type is a constructor.
+         */
+        function isClassInstanceType(node: TypeNode) {
+            let symbol = getNodeLinks(node).resolvedSymbol;
+            let isValue = symbol && symbolIsValue(symbol);
+            let valueType = isValue && getTypeOfSymbol(symbol);
+            let isConstructor = valueType && isConstructorType(valueType);
+            return isConstructor;
+        }
+
+        /**
          * Checks that the return type provided is an instantiation of the global Promise<T> type
          * and returns the awaited type of the return type.
          *
@@ -12543,11 +12561,17 @@ namespace ts {
 
             const globalPromiseType = getGlobalPromiseType();
             if (globalPromiseType === emptyGenericType
-                || globalPromiseType === getTargetType(returnType)) {
+                || isTypeAssignableTo(globalPromiseType, returnType)) {
                 // Either we couldn't resolve the global promise type, which would have already
-                // reported an error, or we could resolve it and the return type is a valid type
-                // reference to the global type. In either case, we return the awaited type for
-                // the return type.
+                // reported an error, or we could resolve it and it is assignable to the return type.
+
+                // Ensure the return type is a not class type other than the global Promise, since we know it can't have any other type at runtime.
+                if (isClassInstanceType(<TypeNode>location) && globalPromiseType !== getTargetType(returnType)) {
+                    error(location, Diagnostics.An_async_function_cannot_have_a_return_type_annotation_of_a_class_type_other_than_Promise_T);
+                    return unknownType;
+                }
+
+                // Return the awaited type for the return type.
                 return checkAwaitedType(returnType, location, Diagnostics.An_async_function_or_method_must_have_a_valid_awaitable_return_type);
             }
 
