@@ -2602,6 +2602,7 @@ namespace ts {
                 case SyntaxKind.ExclamationToken:
                 case SyntaxKind.DeleteKeyword:
                 case SyntaxKind.TypeOfKeyword:
+                case SyntaxKind.AsKeyword:
                 case SyntaxKind.VoidKeyword:
                 case SyntaxKind.PlusPlusToken:
                 case SyntaxKind.MinusMinusToken:
@@ -3194,6 +3195,17 @@ namespace ts {
             return finishNode(node);
         }
 
+        function parseUnaryAsExpression(): AsExpression {
+            const left = <PrimaryExpression>createNode(SyntaxKind.NullKeyword);
+            finishNode(left);
+
+            parseExpected(SyntaxKind.AsKeyword);
+            let right = parseType();
+
+            let expr = makeAsExpression(left, right);
+            return finishNode(expr);
+        }
+
         function makeAsExpression(left: Expression, right: TypeNode): AsExpression {
             const node = <AsExpression>createNode(SyntaxKind.AsExpression, left.pos);
             node.expression = left;
@@ -3258,7 +3270,7 @@ namespace ts {
          *      1) SimpleUnaryExpression[?yield]
          *      2) IncrementExpression[?yield] ** UnaryExpression[?yield]
          */
-        function parseUnaryExpressionOrHigher(): UnaryExpression | BinaryExpression {
+        function parseUnaryExpressionOrHigher(): UnaryExpression | BinaryExpression | AsExpression {
             if (isAwaitExpression()) {
                 return parseAwaitExpression();
             }
@@ -3269,6 +3281,10 @@ namespace ts {
                     <BinaryExpression>parseBinaryExpressionRest(getBinaryOperatorPrecedence(), incrementExpression) :
                     incrementExpression;
             }
+
+            if (token === SyntaxKind.AsKeyword) {
+                return parseUnaryAsExpression();
+            }            
 
             const unaryOperator = token;
             const simpleUnaryExpression = parseSimpleUnaryExpression();
@@ -3340,6 +3356,7 @@ namespace ts {
                 case SyntaxKind.ExclamationToken:
                 case SyntaxKind.DeleteKeyword:
                 case SyntaxKind.TypeOfKeyword:
+                case SyntaxKind.AsKeyword:
                 case SyntaxKind.VoidKeyword:
                     return false;
                 case SyntaxKind.LessThanToken:
