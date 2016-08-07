@@ -429,6 +429,11 @@ namespace ts {
             name: "strictNullChecks",
             type: "boolean",
             description: Diagnostics.Enable_strict_null_checks
+        },
+        {
+            name: "narrowFromAny",
+            type: "boolean",
+            description: Diagnostics.Perform_narrowing_on_variables_of_type_any
         }
     ];
 

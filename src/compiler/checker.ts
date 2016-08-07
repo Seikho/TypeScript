@@ -52,6 +52,7 @@ namespace ts {
         const noUnusedIdentifiers = !!compilerOptions.noUnusedLocals || !!compilerOptions.noUnusedParameters;
         const allowSyntheticDefaultImports = typeof compilerOptions.allowSyntheticDefaultImports !== "undefined" ? compilerOptions.allowSyntheticDefaultImports : modulekind === ModuleKind.System;
         const strictNullChecks = compilerOptions.strictNullChecks;
+        const narrowFromAny = compilerOptions.narrowFromAny;
 
         const emitResolver = createResolver();
 
@@ -8450,8 +8451,8 @@ namespace ts {
                     }
                     return type;
                 }
-                // We never narrow type any in an instanceof guard
-                if (isTypeAny(type)) {
+                // We only narrow from type 'any'' in an instanceof guard if the --narrowAny option was specified
+                if (!narrowFromAny && isTypeAny(type)) {
                     return type;
                 }
 
@@ -8516,7 +8517,7 @@ namespace ts {
             }
 
             function narrowTypeByTypePredicate(type: Type, callExpression: CallExpression, assumeTrue: boolean): Type {
-                if (type.flags & TypeFlags.Any || !hasMatchingArgument(callExpression, reference)) {
+                if ((!narrowFromAny && type.flags & TypeFlags.Any) || !hasMatchingArgument(callExpression, reference)) {
                     return type;
                 }
                 const signature = getResolvedSignature(callExpression);

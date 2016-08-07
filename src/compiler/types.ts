@@ -2633,6 +2633,7 @@ namespace ts {
         typeRoots?: string[];
         /*@internal*/ version?: boolean;
         /*@internal*/ watch?: boolean;
+        narrowFromAny?: boolean;
 
         [option: string]: CompilerOptionsValue | undefined;
     }
