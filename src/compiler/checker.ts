@@ -8451,7 +8451,7 @@ namespace ts {
                     }
                     return type;
                 }
-                // We only narrow from type 'any'' in an instanceof guard if the --narrowAny option was specified
+                // We only narrow from type 'any' in an instanceof guard if the --narrowFromAny option was specified
                 if (!narrowFromAny && isTypeAny(type)) {
                     return type;
                 }
